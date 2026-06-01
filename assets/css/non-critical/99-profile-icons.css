@@ -1,0 +1,5 @@
+.jr-basics__profile svg,
+.jr-basics__profile a:hover svg {
+  fill: none;
+  stroke: currentColor;
+}

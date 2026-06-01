@@ -1,0 +1,279 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Will Andersen",
+    "label": "VR/XR-Spezialist & technischer Berater",
+    "image": "/profile-photo-cropped.png",
+    "email": "",
+    "phone": "",
+    "url": "",
+    "summary": "Ich bin Software Engineer mit Schwerpunkt auf C#- und Unity-Entwicklung. Ich habe zahlreiche VR/XR-, Desktop- und Mobile-Anwendungen entwickelt und mitgestaltet, die für Digital Twinning oder interne Trainingsprozesse eingesetzt werden, unter anderem für staatlich geförderte Forschungseinrichtungen, Universitäten und deren Curricula, Streitkräfte und private Unternehmen.",
+    "location": {
+      "city": "Wien, Österreich"
+    },
+    "profiles": [
+      {
+        "network": "mail",
+        "url": "mailto:mail@wandersen.dev"
+      },
+      {
+        "network": "linkedin",
+        "url": "https://www.linkedin.com/in/wandersencs/"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "MINDCONSOLE GmbH / XRCONSOLE",
+      "location": "Wien, Österreich",
+      "description": "Lernen mit XR",
+      "position": "Senior Unity Developer",
+      "url": "https://xrconsole.net/",
+      "startDate": "01.02.2026",
+      "endDate": "Laufend",
+      "summary": "XRCONSOLE verbindet digitale Transformation, immersive Trainingskonzepte und XR-Trainingsdesign in einer einzigartigen Synergie. Unsere Expertise liegt darin, diese Komponenten nahtlos zu integrieren und Lernerlebnisse auf ein neues Niveau zu heben.",
+      "highlights": [
+        "Entwicklung zahlreicher VR/XR-Trainingsanwendungen von Anfang bis Ende für private Unternehmen und staatlich geförderte Kunden",
+        "Aufbau eines modularen und wiederverwendbaren Frameworks auf Basis von XRI für den Einsatz in verschiedenen Projekten und auf unterschiedlichen Geräten",
+        "Beratung von Kunden zur besten technischen Vorgehensweise und Unterstützung bei der Ausarbeitung von Projektanforderungen."
+      ]
+    },
+    {
+      "name": "MINDCONSOLE GmbH / XRCONSOLE",
+      "location": "Wien, Österreich",
+      "description": "Lernen mit XR",
+      "position": "Unity Developer",
+      "url": "https://xrconsole.net/",
+      "startDate": "01.08.2023",
+      "endDate": "01.02.2026",
+      "summary": "",
+      "highlights": []
+    },
+    {
+      "name": "SOMAREALITY GmbH",
+      "location": "Wien, Österreich",
+      "description": "Individuelle VR/XR-Apps für Kunden",
+      "position": "Unity Developer",
+      "url": "https://somareality.com/",
+      "startDate": "01.04.2023",
+      "endDate": "30.06.2023",
+      "summary": "SOMAREALITY ist auf die Entwicklung von eye-tracking-basierten digitalen Biomarkern spezialisiert und verändert damit, wie kognitive Prozesse in Echtzeit verstanden und überwacht werden.",
+      "highlights": [
+        "Mitentwicklung der Nutzung wissenschaftlich validierter kognitiver digitaler Biomarker auf Basis von Eye Tracking in Unity",
+        "Erstellung verschiedener Trainingsanwendungen für den medizinischen Bereich, darunter die Medizinische Universität Wien, das Österreichische Bundesheer und Drittunternehmen für interne Trainingszwecke",
+        "Modernisierung des bestehenden zentralen VR-Frameworks des Projektteams zu einer wartbareren Lösung."
+      ]
+    },
+    {
+      "name": "SOMAREALITY GmbH",
+      "location": "Wien, Österreich",
+      "description": "Individuelle VR/XR-Apps für Kunden",
+      "position": "Junior Unity Developer",
+      "url": "https://somareality.com/",
+      "startDate": "01.03.2022",
+      "endDate": "31.03.2023",
+      "summary": "",
+      "highlights": []
+    }
+  ],
+  "volunteer": [
+    {
+      "organization": "Berufsrettung Wien",
+      "position": "Sanitäter & Innendienst",
+      "url": "https://www.wien.gv.at/kontakt/ma70",
+      "startDate": "01.02.2016",
+      "endDate": "01.10.2016",
+      "summary": "",
+      "highlights": []
+    }
+  ],
+  "education": [
+    {
+      "institution": "SAE Institute, 1010 Wien / Middlesex University",
+      "url": "https://www.mdx.ac.uk/",
+      "area": "Games Programming",
+      "studyType": "BSc.",
+      "startDate": "03.2018",
+      "endDate": "09.2021",
+      "score": "",
+      "courses": [
+        "Upper Second Class Honours"
+      ]
+    },
+    {
+      "institution": "TU Wien, 1040 Wien",
+      "url": "https://www.tuwien.at/",
+      "area": "Elektrotechnik",
+      "studyType": "BSc.",
+      "startDate": "10.2015/03.2016",
+      "endDate": "10.2016/03.2017",
+      "score": "",
+      "courses": [
+        "2 Semester"
+      ]
+    },
+    {
+      "institution": "Lycée Français de Vienne, 1090 Wien",
+      "url": "https://lyceefrancais.at/",
+      "area": "Schule",
+      "studyType": "Baccalauréat Scientifique & Matura",
+      "startDate": "2002",
+      "endDate": "2014",
+      "score": "",
+      "courses": []
+    }
+  ],
+  "awards": [
+    {
+      "title": "Pionierpreis für digitale Kompression",
+      "date": "2014-11-01",
+      "awarder": "TechCrunch",
+      "summary": "Es gibt keinen Löffel."
+    }
+  ],
+  "certificates": [],
+  "publications": [
+    {
+      "name": "Videokompression für 3D-Medien",
+      "publisher": "Hooli",
+      "releaseDate": "2014-10-01",
+      "url": "http://en.wikipedia.org/wiki/Silicon_Valley_(TV_series)",
+      "summary": "Innovativer Middle-Out-Kompressionsalgorithmus, der verändert, wie Daten gespeichert werden."
+    }
+  ],
+  "skills": [
+    {
+      "name": "Programmierung",
+      "keywords": [
+        {
+          "name": "C#",
+          "level": 9
+        },
+        {
+          "name": "C++",
+          "level": 3
+        },
+        {
+          "name": "HLSL",
+          "level": 4
+        },
+        {
+          "name": "Python",
+          "level": 8
+        },
+        {
+          "name": "Bash",
+          "level": 5
+        },
+        {
+          "name": "Versionsverwaltung",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "name": "Engine-Kenntnisse",
+      "keywords": [
+        {
+          "name": "Unity",
+          "level": 9
+        },
+        {
+          "name": "Godot",
+          "level": 6
+        },
+        {
+          "name": "Unreal",
+          "level": 4
+        }
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "Englisch",
+      "fluency": "Muttersprache/C2"
+    },
+    {
+      "language": "Deutsch",
+      "fluency": "Muttersprache/C2"
+    },
+    {
+      "language": "Französisch",
+      "fluency": "Verhandlungssicher/C1"
+    },
+    {
+      "language": "Spanisch",
+      "fluency": "Grundkenntnisse/B1"
+    }
+  ],
+  "interests": [
+    {
+      "name": "Videospiele",
+      "keywords": [
+        "Entwicklung",
+        "Analyse",
+        "Kritik"
+      ]
+    },
+    {
+      "name": "Sport",
+      "keywords": [
+        "Badminton",
+        "Bogenschießen"
+      ]
+    },
+    {
+      "name": "Musik",
+      "keywords": [
+        "Indie",
+        "Interessant",
+        "Ungewöhnlich"
+      ]
+    },
+    {
+      "name": "Video",
+      "keywords": [
+        "Filmgeschichte",
+        "Analyse"
+      ]
+    }
+  ],
+  "references": [
+    {
+      "name": "Michel Varilek, CTO & Co-Founder bei SOMAREALITY",
+      "reference": "Als Will Andersen unserem Team (...) beitrat, zeigte sich direkt zu Beginn, dass er ein hohes Maß an technischer Affinität und Allgemeinwissen mitbrachte. Will fügte sich nahtlos in das Team ein und trug zu einer maßgeblichen Verbesserung der Kommunikation im Team bei. Während meiner Abwesenheit übernahm er die Führung unserer Scrum-Meetings und konnte Projekte selbstständig weiterführen, leiten und unseren Kunden vorstellen. (...) Will ist ein ausgesprochen kompetenter Unity Engineer, dessen umfangreiches Wissen und tolle People-Skills eine wertvolle Bereicherung für jedes Entwicklerteam darstellen."
+    }
+  ],
+  "projects": [
+    {
+      "name": "Locomatic",
+      "description": "Ein 2D-Spiel über das Management eines Glücksspielsalons",
+      "highlights": [
+        "SAE-Award-Finalist für das beste Games-Programming-Studentenprojekt",
+        "Satirisiert einen der kontroverseren Glücksspielanbieter in Österreich"
+      ],
+      "keywords": [
+        "Unity",
+        "C#",
+        "Isometrisch",
+        "Pixelkunst",
+        "Satire"
+      ],
+      "startDate": "12.2020",
+      "endDate": "04.2021",
+      "url": "https://kev-the-gamedev.itch.io/locomatic",
+      "roles": [
+        "Softwareentwickler",
+        "Organisator"
+      ],
+      "entity": "in Zusammenarbeit mit dem SAE Institute Wien",
+      "type": "Videospiel"
+    }
+  ],
+  "meta": {
+    "canonical": "https://raw.githubusercontent.com/jsonresume/resume-schema/master/resume.json",
+    "version": "v1.0.0",
+    "lastModified": "2026-05-27T00:00:00"
+  }
+}

@@ -1,0 +1,12 @@
+{{ if gt (len .AllTranslations) 1 }}
+  {{ range sort .AllTranslations "Language.Weight" }}
+    <link
+      rel="alternate"
+      hreflang="{{ .Language.Locale | default .Language.Lang }}"
+      href="{{ .Permalink }}"
+    />
+  {{ end }}
+  {{ with index (where .AllTranslations "Language.Lang" "en") 0 }}
+    <link rel="alternate" hreflang="x-default" href="{{ .Permalink }}" />
+  {{ end }}
+{{ end }}

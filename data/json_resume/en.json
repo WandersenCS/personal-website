@@ -1,0 +1,281 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
+  "basics": {
+    "name": "Will Andersen",
+    "label": "VR/XR Specialist & Technical Consultant",
+    "image": "/profile-photo-cropped.png",
+    "email": "",
+    "phone": "",
+    "url": "",
+    "summary": "I am a software engineer who specializes in C# and Unity development. I have created and contributed to a multitude of VR/XR, Desktop and Mobile applications used for Digital Twinning or as internal training processes for a variety of clients including state-funded research institutions, universities and their curricula, armed forces and private businesses.",
+    "location": {
+      "city": "Vienna, Austria"
+    },
+    "profiles": [
+      {
+        "network": "mail",
+        "url": "mailto:mail@wandersen.dev"
+      },
+      {
+        "network": "linkedin",
+        "url": "https://www.linkedin.com/in/wandersencs/"
+      }
+    ]
+  },
+  "work": [
+    {
+      "name": "MINDCONSOLE GmbH / XRCONSOLE",
+      "location": "Vienna, Austria",
+      "description": "Learning with XR",
+      "position": "Senior Unity Developer",
+      "url": "https://xrconsole.net/",
+      "startDate": "01.02.2026",
+      "endDate": "Ongoing",
+      "summary": "XRCONSOLE combines digital transformation, immersive training concepts and XR training design in a unique synergy. Our expertise lies in seamlessly integrating each of these components to take the learning experience to a whole new level.",
+      "highlights": [
+        "Developed a multitude of VR/XR training applications from start to finish for private businesses and state-funded clients",
+        "Created a modular and re-usable framework based on XRI from scratch to use across projects and devices",
+        "Advised clients on the best technical path forward and assisted in outlining project requirements."
+      ]
+    },
+	{
+      "name": "MINDCONSOLE GmbH / XRCONSOLE",
+      "location": "Vienna, Austria",
+      "description": "Learning with XR",
+      "position": "Unity Developer",
+      "url": "https://xrconsole.net/",
+      "startDate": "01.08.2023",
+      "endDate": "01.02.2026",
+      "summary": "",
+      "highlights": []
+    },
+	{
+      "name": "SOMAREALITY GmbH",
+      "location": "Vienna, Austria",
+      "description": "Custom VR/XR Apps for clients",
+      "position": "Unity Developer",
+      "url": "https://somareality.com/",
+      "startDate": "01.04.2023",
+      "endDate": "30.06.2023",
+      "summary": "SOMAREALITY specializes in developing eye tracking-based digital biomarkers, revolutionizing the way we understand and monitor cognitive processes in real-time.",
+      "highlights": [
+        "Helped develop usage of scientifically validated cognitive digital biomarkers based on eye tracking in Unity",
+        "Created diverse training applications for the medical sector (incl. Medical University of Vienna), Austrian Armed Forces and third-party businesses for internal training purposes",
+		"Upgraded the existing central VR framework of the project team to a more maintainable one."
+      ]
+    },
+	{
+      "name": "SOMAREALITY GmbH",
+      "location": "Vienna, Austria",
+      "description": "Custom VR/XR Apps for clients",
+      "position": "Junior Unity Developer",
+      "url": "https://somareality.com/",
+      "startDate": "01.03.2022",
+      "endDate": "31.03.2023",
+      "summary": "",
+      "highlights": []
+    }
+  ],
+  "volunteer": [
+    {
+      "organization": "Berufsrettung Wien",
+      "position": "Paramedic & Internal Operations",
+      "url": "https://www.wien.gv.at/kontakt/ma70",
+      "startDate": "01.02.2016",
+      "endDate": "01.10.2016",
+      "summary": "",
+      "highlights": [
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "SAE Intitute, 1010 Vienna / Middlesex University",
+      "url": "https://www.mdx.ac.uk/",
+      "area": "Games Programming",
+      "studyType": "BSc.",
+      "startDate": "03.2018",
+      "endDate": "09.2021",
+      "score": "",
+      "courses": [
+	  "Upper Second Class Honours"
+      ]
+    },
+	{
+      "institution": "TU Wien, 1040 Vienna",
+      "url": "https://www.tuwien.at/",
+      "area": "Electrical Engineering",
+      "studyType": "BSc.",
+      "startDate": "10.2015/03.2016",
+      "endDate": "10.2016/03.2017",
+      "score": "",
+      "courses": [
+	  "2 Semesters"
+      ]
+    },
+	{
+      "institution": "Lycée Français de Vienne, 1090 Vienna",
+      "url": "https://lyceefrancais.at/",
+      "area": "School",
+      "studyType": "Baccalauréat Scientifique & Matura",
+      "startDate": "2002",
+      "endDate": "2014",
+      "score": "",
+      "courses": [
+      ]
+    }
+  ],
+  "awards": [
+    {
+      "title": "Digital Compression Pioneer Award",
+      "date": "2014-11-01",
+      "awarder": "TechCrunch",
+      "summary": "There is no spoon."
+    }
+  ],
+  "certificates": [],
+  "publications": [
+    {
+      "name": "Video compression for 3d media",
+      "publisher": "Hooli",
+      "releaseDate": "2014-10-01",
+      "url": "http://en.wikipedia.org/wiki/Silicon_Valley_(TV_series)",
+      "summary": "Innovative middle-out compression algorithm that changes the way we store data."
+    }
+  ],
+  "skills": [
+    {
+      "name": "Programming",
+      "keywords": [
+        {
+          "name": "C#",
+          "level": 9
+        },
+        {
+          "name": "C++",
+          "level": 3
+        },
+        {
+          "name": "HLSL",
+          "level": 4
+        },
+        {
+          "name": "Python",
+          "level": 8
+        },
+        {
+          "name": "Bash",
+          "level": 5
+        },
+        {
+          "name": "Source Control",
+          "level": 9
+        }
+      ]
+    },
+    {
+      "name": "Engine Knowledge",
+      "keywords": [
+        {
+          "name": "Unity",
+          "level": 9
+        },
+        {
+          "name": "Godot",
+          "level": 6
+        },
+        {
+          "name": "Unreal",
+          "level": 4
+        }
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "language": "English",
+      "fluency": "Native Speaker/C2"
+    },
+    {
+      "language": "German",
+      "fluency": "Native Speaker/C2"
+    },
+    {
+      "language": "French",
+      "fluency": "Full Professional Proficiency/C1"
+    },
+    {
+      "language": "Spanish",
+      "fluency": "Basic Proficiency/B1"
+    }
+  ],
+  "interests": [
+    {
+      "name": "Videogames",
+      "keywords": [
+        "Development",
+        "Analysis",
+		"Critique"
+      ]
+    },
+	{
+      "name": "Sport",
+      "keywords": [
+        "Badminton",
+        "Archery"
+      ]
+    },
+	{
+      "name": "Music",
+      "keywords": [
+        "Indie",
+        "Interesting",
+		"Unusual"
+      ]
+    },
+	{
+      "name": "Video",
+      "keywords": [
+        "Filmograghic History",
+        "Analysis"
+      ]
+    }
+  ],
+  "references": [
+	{
+      "name": "Michel Varilek, CTO & Co-Founder at SOMAREALITY",
+      "reference": "When Will Andersen joined our team (...), it was clear right from the start that he possessed a high level of technical aptitude and general knowledge. Will slotted seamlessly into the team and played a key role in significantly improving communication within the team. During my absence, he took the lead in our Scrum meetings and was able to independently continue, manage and present projects to our clients. (...) Will is an exceptionally competent Unity Engineer whose extensive knowledge and excellent people skills are a valuable asset to any development team."
+    }
+  ],
+  "projects": [
+    {
+      "name": "Locomatic",
+      "description": "A 2D Gambling Parlor Management Game",
+      "highlights": [
+        "SAE Award Finalist for 'Best Games Programming Students Project'",
+        "Satirizes one of the more controversial gambling providers in Austria"
+      ],
+      "keywords": [
+        "Unity",
+		"C#",
+        "Isometric",
+		"Pixel Art",
+        "Satire"
+      ],
+      "startDate": "12.2020",
+      "endDate": "04.2021",
+      "url": "https://kev-the-gamedev.itch.io/locomatic",
+      "roles": [
+        "Software Developer",
+        "Organizer"
+      ],
+      "entity": "in association with SAE Institute Vienna",
+      "type": "videogame"
+    }
+  ],
+  "meta": {
+    "canonical": "https://raw.githubusercontent.com/jsonresume/resume-schema/master/resume.json",
+    "version": "v1.0.0",
+    "lastModified": "2026-05-27T00:00:00"
+  }
+}

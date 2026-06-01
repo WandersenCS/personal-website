@@ -1,0 +1,58 @@
+<header>
+  <a
+    class="logo"
+    href="{{ "/" | relLangURL }}"
+  >
+    {{ with $.Site.Params.Logo.Text }}
+      <div class="logo__text">{{ . }}</div>
+    {{ end }}
+    <div class="logo__chevron">></div>
+    <div class="logo__cursor">█</div>
+  </a>
+
+  <nav id="menu">
+    <ul class="menu--horizontal">
+      {{ range $.Site.Menus.main }}
+        <li class="menu__item">
+          {{ partial "menu-link.html" (dict "page" $ "item" . "class" "menu__link") }}
+        </li>
+      {{ end }}
+      <li class="menu__item language-switcher--desktop">
+        {{ partial "language-switcher.html" $ }}
+      </li>
+    </ul>
+
+    <div class="menu__burger">
+      <input
+        id="menu__toggle"
+        class="menu__item"
+        type="checkbox"
+        aria-label="Open main menu"
+      />
+
+      {{ partial "icons/tabler-icon.html" "outline/menu-2" }}
+
+      <label class="menu__overlay" for="menu__toggle" aria-hidden="true"></label>
+
+      <ul class="menu--vertical">
+        {{ range $.Site.Menus.main }}
+          <li>
+            {{ partial "menu-link.html" (dict "page" $ "item" . "class" "menu__item menu__link") }}
+          </li>
+        {{ end }}
+      </ul>
+    </div>
+  </nav>
+
+  <div class="header__mobile-controls">
+    {{ partial "language-switcher.html" $ }}
+  </div>
+
+  <button class="theme__toggle light--hidden" aria-label="Toggle light mode">
+    {{ partial "icons/tabler-icon.html" "outline/sun" }}
+  </button>
+
+  <button class="theme__toggle dark--hidden" aria-label="Toggle dark mode">
+    {{ partial "icons/tabler-icon.html" "outline/moon" }}
+  </button>
+</header>

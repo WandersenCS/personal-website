@@ -1,0 +1,13 @@
+{{ $page := .page }}
+{{ $item := .item }}
+{{ $isHome := eq $item.Identifier "home" }}
+{{ $url := cond $isHome $page.Site.Home.RelPermalink ($item.URL | relLangURL) }}
+{{ $isActive := cond $isHome $page.IsHome (or ($page.IsMenuCurrent "main" $item) (or ($page.HasMenuCurrent "main" $item) (eq $page.RelPermalink $url))) }}
+
+<a
+  class="{{ .class }}{{ if $isActive }} menu__link--active{{ end }}"
+  href="{{ $url }}"
+  {{ if $isActive }}aria-current="page"{{ end }}
+>
+  {{ $item.Name }}
+</a>

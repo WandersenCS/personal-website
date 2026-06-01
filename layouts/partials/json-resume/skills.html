@@ -1,0 +1,29 @@
+{{ $cv := index hugo.Data.json_resume $.Site.Language.Lang }}
+{{ with $cv.skills }}
+  <div class="jr__list jr-skills__list">
+    {{ range . }}
+      <div class="jr__item jr-skills__item">
+        <p><strong>{{ .name }}</strong></p>
+        {{ with .keywords }}
+          <ul class="jr-skills__keywords">
+            {{ range $keyword := . }}
+              <li>
+                {{- if reflect.IsMap $keyword -}}
+                  {{- $level := int (default 0 $keyword.level) -}}
+                  <span class="jr-skills__keyword-name">{{ $keyword.name }}</span>
+                  <span class="jr-skills__level" aria-label="{{ $level }} out of 10">
+                    {{- range seq 1 10 -}}
+                      <span>{{- if le . $level -}}■{{- else -}}□{{- end -}}</span>
+                    {{- end -}}
+                  </span>
+                {{- else -}}
+                  <span class="jr-skills__keyword-name">{{ $keyword }}</span>
+                {{- end -}}
+              </li>
+            {{ end }}
+          </ul>
+        {{ end }}
+      </div>
+    {{ end }}
+  </div>
+{{ end }}

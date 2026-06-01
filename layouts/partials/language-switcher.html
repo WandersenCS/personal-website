@@ -1,0 +1,16 @@
+{{ $page := . }}
+{{ if gt (len $page.AllTranslations) 1 }}
+  <label class="language-switcher">
+    <span class="language-switcher__label">Language</span>
+    <select aria-label="Language" onchange="window.location.href = this.value">
+      {{ range sort $page.AllTranslations "Language.Weight" }}
+        <option
+          value="{{ .RelPermalink }}"
+          {{ if eq .Language.Lang $page.Language.Lang }}selected{{ end }}
+        >
+          {{ .Language.Label | default .Language.Lang }}
+        </option>
+      {{ end }}
+    </select>
+  </label>
+{{ end }}

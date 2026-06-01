@@ -1,0 +1,6 @@
+<h{{ .Level }} id="{{ .Anchor | safeURL }}">
+  <a href="#{{ .Anchor | safeURL }}" class="post-heading__link">
+    {{- .Text | safeHTML -}}
+    <span class="post-heading__anchor" aria-hidden="true">█</span>
+  </a>
+</h{{ .Level }}>

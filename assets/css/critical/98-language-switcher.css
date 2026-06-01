@@ -1,0 +1,110 @@
+.language-switcher {
+  align-items: center;
+  display: flex;
+}
+
+.language-switcher__label {
+  display: none;
+}
+
+.language-switcher select {
+  background: var(--bg2);
+  border: 1px solid var(--bg3);
+  border-radius: 0.2rem;
+  color: var(--fg);
+  cursor: pointer;
+  font: inherit;
+  padding: 0.1rem 0.35rem;
+  width: 7.25rem;
+}
+
+.language-switcher select:hover,
+.language-switcher select:focus {
+  border-color: var(--bg4);
+  outline: none;
+}
+
+.header__mobile-controls {
+  display: none;
+  grid-area: language;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+nav#menu ul.menu--horizontal li.language-switcher--desktop {
+  display: none;
+}
+
+nav#menu .menu__link--active {
+  font-weight: 700;
+}
+
+.theme__toggle {
+  height: 2rem;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  width: 2rem;
+}
+
+nav#menu .menu__overlay {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  header {
+    align-items: center;
+    column-gap: 0.5rem;
+    grid-template-areas: "heading language theme-toggle nav";
+    grid-template-columns: 1fr auto auto auto;
+  }
+
+  .header__mobile-controls {
+    display: flex;
+  }
+
+  .header__mobile-controls .language-switcher select {
+    max-width: none;
+  }
+
+  nav#menu ul.menu--horizontal {
+    display: none;
+  }
+
+  nav#menu .menu__burger {
+    display: flex;
+    position: relative;
+  }
+
+  nav#menu ul.menu--vertical {
+    box-sizing: border-box;
+    max-width: 20rem;
+    padding: 4.5rem 1.5rem 2rem;
+    width: min(78vw, 20rem);
+  }
+
+  nav#menu .menu__burger input:checked ~ .menu__overlay {
+    bottom: 0;
+    cursor: default;
+    display: block;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 9;
+  }
+}
+
+@media (min-width: 768px) {
+  header {
+    align-items: center;
+    column-gap: 0.75rem;
+    grid-template-areas: "heading search nav theme-toggle";
+    grid-template-columns: auto auto 1fr auto;
+  }
+
+  nav#menu ul.menu--horizontal li.language-switcher--desktop {
+    display: inline-flex;
+  }
+
+}
