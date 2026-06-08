@@ -4,6 +4,7 @@
 /assets/jsconfig.json
 hugo_stats.json
 /node_modules/
+**/node_modules/
 npm-debug.log*
 
 # Executable may be added to repository
