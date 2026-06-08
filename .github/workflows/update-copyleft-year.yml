@@ -1,0 +1,54 @@
+name: Update Copyleft Year
+
+on:
+  schedule:
+    - cron: "10 1 1 1 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update copyleft year
+        run: |
+          python <<'PY'
+          from datetime import datetime, timezone
+          from pathlib import Path
+          import re
+
+          path = Path("hugo.toml")
+          content = path.read_text(encoding="utf-8")
+          year = datetime.now(timezone.utc).year
+          pattern = re.compile(r'copyright = "Copyleft (.) \d{4} Will Andersen"')
+
+          if not pattern.search(content):
+              raise SystemExit("No copyleft notice found to update.")
+
+          updated = pattern.sub(
+              rf'copyright = "Copyleft \1 {year} Will Andersen"',
+              content,
+              count=1,
+          )
+
+          if updated == content:
+              print("Copyleft notice already uses the current year.")
+          else:
+              path.write_text(updated, encoding="utf-8")
+
+          PY
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: auto/update-copyleft-year
+          delete-branch: true
+          add-paths: hugo.toml
+          commit-message: Updates copyleft year
+          title: Updates copyleft year
+          body: Automated annual copyleft notice year update.
