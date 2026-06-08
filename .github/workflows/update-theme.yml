@@ -43,6 +43,14 @@ jobs:
         with:
           branch: auto/update-hugo-theme-gruvbox
           delete-branch: true
-          commit-message: Updates hugo-theme-gruvbox
-          title: Updates hugo-theme-gruvbox
-          body: Automated Hugo module and npm dependency update for hugo-theme-gruvbox.
+          add-paths: |
+            go.mod
+            go.sum
+            package-lock.json
+            package.json
+            package.hugo.json
+            packages/hugoautogen/package.json
+            packages/hugoautogen/hugo_packagemeta.json
+          commit-message: Updates Hugo modules
+          title: Updates Hugo modules
+          body: Automated Hugo module and npm dependency update.
