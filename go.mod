@@ -1,6 +1,6 @@
 module github.com/WandersenCS/personal-website
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/schnerring/hugo-mod-json-resume v0.0.0-20260630024015-aa281e55fbe0 // indirect
