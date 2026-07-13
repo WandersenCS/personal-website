@@ -30,11 +30,50 @@ jobs:
           extended: true
 
       - name: Update theme module and npm dependencies
+        id: update
+        shell: bash
         run: |
+          set -euo pipefail
+
           hugo mod get -u github.com/schnerring/hugo-theme-gruvbox github.com/schnerring/hugo-mod-json-resume
           hugo mod tidy
           hugo mod npm pack
           npm install
+
+          npm_state="$RUNNER_TEMP/npm-state"
+          mkdir -p "$npm_state/packages/hugoautogen"
+          cp package-lock.json "$npm_state/package-lock.json"
+          cp package.json "$npm_state/package.json"
+          cp package.hugo.json "$npm_state/package.hugo.json"
+          cp packages/hugoautogen/package.json "$npm_state/packages/hugoautogen/package.json"
+          cp packages/hugoautogen/hugo_packagemeta.json "$npm_state/packages/hugoautogen/hugo_packagemeta.json"
+
+          audit_note=""
+          if ! npm audit; then
+            if npm audit fix && npm audit; then
+              :
+            elif npm audit fix --force && npm audit; then
+              :
+            else
+              cp "$npm_state/package-lock.json" package-lock.json
+              cp "$npm_state/package.json" package.json
+              cp "$npm_state/package.hugo.json" package.hugo.json
+              cp "$npm_state/packages/hugoautogen/package.json" packages/hugoautogen/package.json
+              cp "$npm_state/packages/hugoautogen/hugo_packagemeta.json" packages/hugoautogen/hugo_packagemeta.json
+              npm install
+              audit_note="npm modules update failed during audit. The PR keeps the Hugo module update and builds without audit-driven npm changes."
+            fi
+          fi
+
+          pr_body="$RUNNER_TEMP/update-theme-pr-body.md"
+          {
+            echo "Automated Hugo module and npm dependency update."
+            if [ -n "$audit_note" ]; then
+              echo
+              echo "$audit_note"
+            fi
+          } > "$pr_body"
+          echo "pr_body_path=$pr_body" >> "$GITHUB_OUTPUT"
 
       - name: Verify updated site builds
         run: hugo --gc --minify --environment production --baseURL "https://wandersen.dev/"
@@ -54,4 +93,4 @@ jobs:
             packages/hugoautogen/hugo_packagemeta.json
           commit-message: Updates Hugo modules
           title: Updates Hugo modules
-          body: Automated Hugo module and npm dependency update.
+          body-path: ${{ steps.update.outputs.pr_body_path }}
