@@ -48,7 +48,25 @@ module.exports = {
               const els = JSON.parse(content).htmlElements;
               return els.tags.concat(els.classes, els.ids);
             },
-            safelist: ["data-theme"],
+            safelist: [
+              "data-theme",
+              "cv-export__row",
+              "cv-export__status--warning",
+              "cv-export-filtering",
+              "cv-export-hidden",
+              "cv-export-image-large",
+              "cv-export-image-medium",
+              "cv-export-image-small",
+              "cv-export-measure",
+              "cv-export-print-dark",
+              "cv-export-print-light",
+              "cv-export-print-main",
+              "cv-export-print-page",
+              "cv-export-print-side",
+              "cv-export-printing",
+              "cv-export-profile-link",
+              "cv-export-target-one",
+            ],
           }),
         ]
       : []),

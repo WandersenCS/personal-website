@@ -1,0 +1,211 @@
+{{ if eq .Type "cv" }}
+  {{ $labels := dict
+    "en" (dict
+      "title" "PDF export"
+      "note" "Choose sections, columns, ordering, and print styling."
+      "close" "Close PDF export"
+      "language" "Language"
+      "exportLanguage" "PDF export language"
+      "target" "Target"
+      "noTarget" "No target"
+      "onePage" "1 page"
+      "twoPages" "2 pages"
+      "theme" "Theme"
+      "light" "Light"
+      "dark" "Dark"
+      "export" "Export as PDF"
+      "profile" "Profile: summary and photo"
+      "profileColumn" "PDF column for profile summary and photo"
+      "sidebar" "Sidebar"
+      "main" "Main"
+      "profileImage" "Profile image"
+      "profileImageSize" "PDF profile image size"
+      "small" "Small"
+      "medium" "Medium"
+      "large" "Large"
+      "showLinks" "Show profile link text"
+      "autoFit" "Auto-fit export scale"
+      "include" "Include"
+      "pdfColumnFor" "PDF column for"
+      "estimated" "Estimated content:"
+      "page" "page"
+      "pages" "pages"
+      "autoFitStatus" "Auto-fit:"
+      "autoFitMain" "main"
+      "autoFitSidebar" "sidebar"
+      "warning" "Warning: selected content exceeds the page target."
+      "confirmPrefix" "Selected content is estimated at"
+      "confirmSuffix" "pages. Continue to print anyway?"
+      "languageNames" (dict "en" "English" "de" "German" "fr" "French")
+    )
+    "de" (dict
+      "title" "PDF-Export"
+      "note" "Abschnitte, Spalten, Reihenfolge und Druckstil wählen."
+      "close" "PDF-Export schließen"
+      "language" "Sprache"
+      "exportLanguage" "Sprache für PDF-Export"
+      "target" "Ziel"
+      "noTarget" "Kein Ziel"
+      "onePage" "1 Seite"
+      "twoPages" "2 Seiten"
+      "theme" "Darstellung"
+      "light" "Hell"
+      "dark" "Dunkel"
+      "export" "Als PDF exportieren"
+      "profile" "Profil: Zusammenfassung und Foto"
+      "profileColumn" "PDF-Spalte für Profil, Zusammenfassung und Foto"
+      "sidebar" "Seitenleiste"
+      "main" "Hauptspalte"
+      "profileImage" "Profilbild"
+      "profileImageSize" "PDF-Profilbildgröße"
+      "small" "Klein"
+      "medium" "Mittel"
+      "large" "Groß"
+      "showLinks" "Profil-Linktext anzeigen"
+      "autoFit" "Export automatisch skalieren"
+      "include" "Einbeziehen"
+      "pdfColumnFor" "PDF-Spalte für"
+      "estimated" "Geschätzter Inhalt:"
+      "page" "Seite"
+      "pages" "Seiten"
+      "autoFitStatus" "Auto-fit:"
+      "autoFitMain" "Hauptspalte"
+      "autoFitSidebar" "Seitenleiste"
+      "warning" "Warnung: Ausgewählter Inhalt überschreitet das Seitenziel."
+      "confirmPrefix" "Ausgewählter Inhalt wird auf"
+      "confirmSuffix" "Seiten geschätzt. Trotzdem drucken?"
+      "languageNames" (dict "en" "Englisch" "de" "Deutsch" "fr" "Französisch")
+    )
+    "fr" (dict
+      "title" "Export PDF"
+      "note" "Choisir les sections, les colonnes, l’ordre et le style d’impression."
+      "close" "Fermer l'export PDF"
+      "language" "Langue"
+      "exportLanguage" "Langue de l'export PDF"
+      "target" "Objectif"
+      "noTarget" "Aucun objectif"
+      "onePage" "1 page"
+      "twoPages" "2 pages"
+      "theme" "Thème"
+      "light" "Clair"
+      "dark" "Sombre"
+      "export" "Exporter en PDF"
+      "profile" "Profil : résumé et photo"
+      "profileColumn" "Colonne PDF pour le profil, le résumé et la photo"
+      "sidebar" "Colonne latérale"
+      "main" "Colonne principale"
+      "profileImage" "Photo de profil"
+      "profileImageSize" "Taille de la photo de profil PDF"
+      "small" "Petite"
+      "medium" "Moyenne"
+      "large" "Grande"
+      "showLinks" "Afficher le texte des liens du profil"
+      "autoFit" "Ajuster automatiquement l’échelle"
+      "include" "Inclure"
+      "pdfColumnFor" "Colonne PDF pour"
+      "estimated" "Contenu estimé :"
+      "page" "page"
+      "pages" "pages"
+      "autoFitStatus" "Ajustement :"
+      "autoFitMain" "principal"
+      "autoFitSidebar" "latéral"
+      "warning" "Avertissement : le contenu sélectionné dépasse l’objectif de pages."
+      "confirmPrefix" "Le contenu sélectionné est estimé à"
+      "confirmSuffix" "pages. Continuer l'impression ?"
+      "languageNames" (dict "en" "Anglais" "de" "Allemand" "fr" "Français")
+    )
+  }}
+  {{ $t := index $labels .Language.Lang | default (index $labels "en") }}
+  {{ $languageNames := index $t "languageNames" }}
+  <div
+    class="cv-export"
+    data-cv-export
+    data-cv-export-label-main="{{ index $t "main" }}"
+    data-cv-export-label-sidebar="{{ index $t "sidebar" }}"
+    data-cv-export-label-include="{{ index $t "include" }}"
+    data-cv-export-label-pdf-column-for="{{ index $t "pdfColumnFor" }}"
+    data-cv-export-label-estimated="{{ index $t "estimated" }}"
+    data-cv-export-label-page="{{ index $t "page" }}"
+    data-cv-export-label-pages="{{ index $t "pages" }}"
+    data-cv-export-label-auto-fit="{{ index $t "autoFitStatus" }}"
+    data-cv-export-label-auto-fit-main="{{ index $t "autoFitMain" }}"
+    data-cv-export-label-auto-fit-sidebar="{{ index $t "autoFitSidebar" }}"
+    data-cv-export-label-warning="{{ index $t "warning" }}"
+    data-cv-export-label-confirm-prefix="{{ index $t "confirmPrefix" }}"
+    data-cv-export-label-confirm-suffix="{{ index $t "confirmSuffix" }}"
+    hidden
+  >
+    <div class="cv-export__backdrop" data-cv-export-close></div>
+    <section class="cv-export__dialog" role="dialog" aria-modal="true" aria-labelledby="cv-export-title">
+      <div class="cv-export__header">
+        <div>
+          <div id="cv-export-title" class="cv-export__title">{{ index $t "title" }}</div>
+          <p class="cv-export__note">{{ index $t "note" }}</p>
+        </div>
+        <button class="cv-export__close" type="button" data-cv-export-close aria-label="{{ index $t "close" }}">×</button>
+      </div>
+
+      <div class="cv-export__settings">
+        {{ if gt (len .AllTranslations) 1 }}
+          <label class="cv-export__field">
+            <span>{{ index $t "language" }}</span>
+            <select data-cv-export-language aria-label="{{ index $t "exportLanguage" }}">
+              {{ range sort .AllTranslations "Language.Weight" }}
+                <option
+                  value="{{ .RelPermalink }}"
+                  {{ if eq .Language.Lang $.Language.Lang }}selected{{ end }}
+                >
+                  {{ index $languageNames .Language.Lang | default .Language.Label | default .Language.Lang }}
+                </option>
+              {{ end }}
+            </select>
+          </label>
+        {{ end }}
+        <label class="cv-export__field">
+          <span>{{ index $t "target" }}</span>
+          <select data-cv-export-target>
+            <option value="">{{ index $t "noTarget" }}</option>
+            <option value="1" selected>{{ index $t "onePage" }}</option>
+            <option value="2">{{ index $t "twoPages" }}</option>
+          </select>
+        </label>
+        <label class="cv-export__field">
+          <span>{{ index $t "theme" }}</span>
+          <select data-cv-export-theme>
+            <option value="light" selected>{{ index $t "light" }}</option>
+            <option value="dark">{{ index $t "dark" }}</option>
+          </select>
+        </label>
+        <button class="cv-export__button" type="button" data-cv-export-print>{{ index $t "export" }}</button>
+      </div>
+
+      <div class="cv-export__status" data-cv-export-status aria-live="polite"></div>
+      <div class="cv-export__profile-row">
+        <span>{{ index $t "profile" }}</span>
+        <select data-cv-export-profile-placement aria-label="{{ index $t "profileColumn" }}">
+          <option value="side" selected>{{ index $t "sidebar" }}</option>
+          <option value="main">{{ index $t "main" }}</option>
+        </select>
+      </div>
+      <div class="cv-export__profile-row">
+        <span>{{ index $t "profileImage" }}</span>
+        <select data-cv-export-profile-image-size aria-label="{{ index $t "profileImageSize" }}">
+          <option value="small">{{ index $t "small" }}</option>
+          <option value="medium">{{ index $t "medium" }}</option>
+          <option value="large" selected>{{ index $t "large" }}</option>
+        </select>
+      </div>
+      <div class="cv-export__option-rows">
+        <label class="cv-export__option-row">
+          <input type="checkbox" data-cv-export-show-profile-links checked />
+          <span>{{ index $t "showLinks" }}</span>
+        </label>
+        <label class="cv-export__option-row">
+          <input type="checkbox" data-cv-export-scale-fill checked />
+          <span>{{ index $t "autoFit" }}</span>
+        </label>
+      </div>
+      <div class="cv-export__rows" data-cv-export-options></div>
+    </section>
+  </div>
+{{ end }}

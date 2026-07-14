@@ -10,3 +10,7 @@
     <link rel="alternate" hreflang="x-default" href="{{ .Permalink }}" />
   {{ end }}
 {{ end }}
+
+{{ if eq .Type "cv" }}
+  <script src="{{ "js/cv-export.js" | relURL }}" defer></script>
+{{ end }}
