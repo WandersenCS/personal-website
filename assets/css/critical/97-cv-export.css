@@ -228,6 +228,55 @@
   margin-top: 0.45rem;
 }
 
+.cv-export input[type="checkbox"] {
+  align-self: center;
+  appearance: none;
+  background: var(--bg1);
+  border: 1px solid var(--bg4);
+  border-radius: 0.15rem;
+  box-sizing: border-box;
+  color: var(--bg0);
+  cursor: pointer;
+  display: inline-grid;
+  height: 1rem;
+  margin: 0;
+  place-content: center;
+  width: 1rem;
+}
+
+.cv-export input[type="checkbox"]::before {
+  border: solid currentColor;
+  border-width: 0 0.13rem 0.13rem 0;
+  content: "";
+  height: 0.48rem;
+  transform: translateY(-0.04rem) rotate(45deg) scale(0);
+  transform-origin: center;
+  width: 0.24rem;
+}
+
+.cv-export input[type="checkbox"]:checked {
+  background: var(--primary-alt);
+  border-color: var(--primary-alt);
+}
+
+.cv-export input[type="checkbox"]:checked::before {
+  transform: translateY(-0.04rem) rotate(45deg) scale(1);
+}
+
+.cv-export input[type="checkbox"]:hover {
+  border-color: var(--primary);
+}
+
+.cv-export input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--primary-alt);
+  outline-offset: 2px;
+}
+
+.cv-export input[type="checkbox"]:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
 /*! purgecss end ignore */
 
 .cv-export__profile-row {
