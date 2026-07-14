@@ -17,11 +17,10 @@
   var scaleFillCheckbox = panel.querySelector("[data-cv-export-scale-fill]");
   var documentRoot = document.querySelector("[data-cv-export-document]");
   var closeButtons = Array.prototype.slice.call(panel.querySelectorAll("[data-cv-export-close]"));
-  var printPage = null;
+  var printDocument = null;
   var draggedSection = null;
   var minPrintScale = 0.88;
   var maxPrintScale = 1.12;
-  var scaleFitSafety = 24;
   var compactEntryTitlesClass = "cv-export-compact-entry-titles";
 
   if (!rowsContainer || !status || !printButton || !targetSelect || !themeSelect || !profileImageSizeSelect || !showProfileLinksCheckbox || !scaleFillCheckbox || !documentRoot) {
@@ -149,9 +148,9 @@
   }
 
   function removePrintPage() {
-    if (printPage) {
-      printPage.remove();
-      printPage = null;
+    if (printDocument) {
+      printDocument.remove();
+      printDocument = null;
     }
     document.documentElement.classList.remove("cv-export-printing");
   }
@@ -164,39 +163,37 @@
     return clone;
   }
 
-  function cloneSelectedSection(section, placement) {
+  function selectedRows(section, placement) {
     if (!section.enabled) {
-      return null;
+      return [];
     }
 
-    var list = section.heading ? section.heading.nextElementSibling : null;
-    if (!list || !list.classList.contains("jr__list")) {
-      return null;
-    }
-
-    var clone = list.cloneNode(true);
-    var selectedCount = 0;
-
-    Array.prototype.slice.call(clone.querySelectorAll(".jr__item")).forEach(function (row) {
-      if (row.classList.contains("cv-export-hidden") || row.dataset.cvExportPlacement !== placement) {
-        row.remove();
-      } else {
-        selectedCount += 1;
-      }
+    return section.rows.filter(function (row) {
+      return !row.classList.contains("cv-export-hidden") && row.dataset.cvExportPlacement === placement;
     });
-
-    return selectedCount ? clone : null;
   }
 
-  function appendSection(target, section, placement) {
-    var sectionClone = cloneSelectedSection(section, placement);
-    if (!sectionClone) {
-      return false;
-    }
+  function buildColumnState(placement) {
+    return {
+      placement: placement,
+      profilePending: placement === "side" && Boolean(activeBio),
+      rowIndex: 0,
+      sectionIndex: 0,
+      sections: sections.map(function (section) {
+        return {
+          heading: section.heading,
+          list: section.heading ? section.heading.nextElementSibling : null,
+          rows: selectedRows(section, placement)
+        };
+      }).filter(function (section) {
+        return section.list && section.rows.length;
+      }),
+      titlePending: placement === "main"
+    };
+  }
 
-    target.appendChild(cloneHeading(section.heading));
-    target.appendChild(sectionClone);
-    return true;
+  function columnHasRemaining(state) {
+    return state.titlePending || state.profilePending || state.sectionIndex < state.sections.length;
   }
 
   function profileLinkText(href) {
@@ -248,137 +245,189 @@
     var shouldCompact = ranges.some(dateRangeIsOnOwnRow);
 
     root.classList.toggle(compactEntryTitlesClass, shouldCompact);
+    return shouldCompact;
   }
 
-  function buildPrintPage(measureOnly) {
-    removePrintPage();
+  function appendProfile(column) {
+    var bioClone = activeBio.cloneNode(true);
+    bioClone.classList.add("cv-export-print-profile");
+    bioClone.classList.add("cv-export-image-" + profileImageSizeSelect.value);
+    addProfileLinks(bioClone);
+    column.appendChild(bioClone);
+  }
 
-    var page = document.createElement("section");
-    page.className = "cv-export-print-page";
-    page.style.setProperty("--cv-export-scale", "1");
-    page.style.setProperty("--cv-export-main-scale", "1");
-    page.style.setProperty("--cv-export-side-scale", "1");
-    page.style.setProperty("--cv-export-heading-scale", "1");
-    if (measureOnly) {
-      page.classList.add("cv-export-measure");
+  function columnOverflows(column) {
+    return column.scrollHeight > column.clientHeight + 1;
+  }
+
+  function advanceCompletedSection(state) {
+    var section = state.sections[state.sectionIndex];
+    if (section && state.rowIndex >= section.rows.length) {
+      state.sectionIndex += 1;
+      state.rowIndex = 0;
+    }
+  }
+
+  function fillColumn(column, state) {
+    var progress = 0;
+
+    if (state.titlePending) {
+      var title = activeDocumentRoot.querySelector(".cv-page__content h1");
+      state.titlePending = false;
+      if (title) {
+        column.appendChild(title.cloneNode(true));
+        progress += 1;
+      }
     }
 
+    if (state.profilePending) {
+      state.profilePending = false;
+      appendProfile(column);
+      progress += 1;
+    }
+
+    while (state.sectionIndex < state.sections.length) {
+      var section = state.sections[state.sectionIndex];
+      var heading = cloneHeading(section.heading);
+      var list = section.list.cloneNode(false);
+      var addedRows = 0;
+
+      column.appendChild(heading);
+      column.appendChild(list);
+
+      while (state.rowIndex < section.rows.length) {
+        var row = section.rows[state.rowIndex].cloneNode(true);
+        list.appendChild(row);
+
+        if (columnOverflows(column)) {
+          row.remove();
+
+          if (!addedRows) {
+            list.remove();
+            heading.remove();
+
+            if (!column.children.length) {
+              column.appendChild(heading);
+              column.appendChild(list);
+              list.appendChild(row);
+              state.rowIndex += 1;
+              progress += 1;
+              advanceCompletedSection(state);
+            }
+          }
+
+          return progress;
+        }
+
+        state.rowIndex += 1;
+        addedRows += 1;
+        progress += 1;
+      }
+
+      advanceCompletedSection(state);
+    }
+
+    return progress;
+  }
+
+  function createPrintPage(documentElement, hasSidebar) {
+    var page = document.createElement("section");
     var main = document.createElement("div");
+
+    page.className = "cv-export-print-page";
     main.className = "cv-export-print-main";
 
-    var side = document.createElement("aside");
-    side.className = "cv-export-print-side";
-
-    var title = activeDocumentRoot.querySelector(".cv-page__content h1");
-    if (title) {
-      main.appendChild(title.cloneNode(true));
+    if (!hasSidebar) {
+      page.classList.add("cv-export-print-page--main-only");
     }
-
-    var bio = activeBio;
-    if (bio) {
-      var bioClone = bio.cloneNode(true);
-      bioClone.classList.add("cv-export-print-profile");
-      bioClone.classList.add("cv-export-image-" + profileImageSizeSelect.value);
-      addProfileLinks(bioClone);
-      side.appendChild(bioClone);
-    }
-
-    sections.forEach(function (section) {
-      appendSection(main, section, "main");
-      appendSection(side, section, "side");
-    });
 
     page.appendChild(main);
-    page.appendChild(side);
-    document.body.appendChild(page);
-    printPage = page;
-    updateEntryTitleCompaction(page);
 
+    if (hasSidebar) {
+      var side = document.createElement("aside");
+      side.className = "cv-export-print-side";
+      page.appendChild(side);
+    }
+
+    documentElement.appendChild(page);
     return page;
   }
 
-  function measurePages() {
-    var page = buildPrintPage(true);
-    var scale = printScaleForPage(page);
-    setPrintScales(page, scale);
-    var pages = measuredPageCount(page, scaleFitSafety);
+  function paginateIntoDocument(documentElement) {
+    var mainState = buildColumnState("main");
+    var sideState = buildColumnState("side");
+    var pageCount = 0;
+
+    while ((columnHasRemaining(mainState) || columnHasRemaining(sideState)) && pageCount < 100) {
+      var hasSidebar = columnHasRemaining(sideState);
+      var page = createPrintPage(documentElement, hasSidebar);
+      var mainProgress = fillColumn(page.querySelector(".cv-export-print-main"), mainState);
+      var sideProgress = hasSidebar ? fillColumn(page.querySelector(".cv-export-print-side"), sideState) : 0;
+
+      pageCount += 1;
+
+      if (!mainProgress && !sideProgress && (columnHasRemaining(mainState) || columnHasRemaining(sideState))) {
+        throw new Error("Selected content cannot be split into A4 pages.");
+      }
+    }
+
+    return pageCount || 1;
+  }
+
+  function setDocumentScale(documentElement, scale) {
+    documentElement.style.setProperty("--cv-export-main-scale", String(scale.main));
+    documentElement.style.setProperty("--cv-export-side-scale", String(scale.side));
+    documentElement.style.setProperty("--cv-export-heading-scale", String(scale.main));
+  }
+
+  function buildPrintDocument(scale, measureOnly) {
     removePrintPage();
+
+    var documentElement = document.createElement("div");
+    documentElement.className = "cv-export-print-document";
+    if (measureOnly) {
+      documentElement.classList.add("cv-export-measure");
+    }
+
+    setDocumentScale(documentElement, scale);
+    document.body.appendChild(documentElement);
+    printDocument = documentElement;
+    paginateIntoDocument(documentElement);
+
+    if (updateEntryTitleCompaction(documentElement)) {
+      documentElement.replaceChildren();
+      paginateIntoDocument(documentElement);
+    }
+
+    return documentElement;
+  }
+
+  function scalePair(value) {
     return {
-      pages: pages,
-      scale: scale
+      main: value,
+      side: value
     };
   }
 
-  function printScaleForPage(page) {
-    if (!scaleFillCheckbox.checked) {
-      return {
-        main: 1,
-        side: 1
-      };
-    }
-
-    setPrintScales(page, {
-      main: 1,
-      side: 1
-    });
-
-    var pages = measuredPageCount(page);
-    var target = targetSelect.value ? Number(targetSelect.value) : null;
-
-    if (!target && pages > 1) {
-      return {
-        main: 1,
-        side: 1
-      };
-    }
-
-    return {
-      main: verifiedColumnScale(page.querySelector(".cv-export-print-main"), target || 1),
-      side: verifiedColumnScale(page.querySelector(".cv-export-print-side"), target || 1)
-    };
+  function fitsPageShape(result, pageLimit, sidebarLimit) {
+    return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit;
   }
 
-  function setPrintScales(page, scale) {
-    page.style.setProperty("--cv-export-main-scale", String(scale.main));
-    page.style.setProperty("--cv-export-side-scale", String(scale.side));
-    page.style.setProperty("--cv-export-heading-scale", String(scale.main));
-    updateEntryTitleCompaction(page);
-  }
-
-  function columnScaleProperty(column) {
-    return column.classList.contains("cv-export-print-side") ? "--cv-export-side-scale" : "--cv-export-main-scale";
-  }
-
-  function setColumnScale(column, scale) {
-    var page = column.closest(".cv-export-print-page");
-    var property = columnScaleProperty(column);
-
-    page.style.setProperty(property, String(scale));
-    if (property === "--cv-export-main-scale") {
-      page.style.setProperty("--cv-export-heading-scale", String(scale));
-    }
-    updateEntryTitleCompaction(page);
-  }
-
-  function verifiedColumnScale(column, targetPages) {
-    var page = column.closest(".cv-export-print-page");
-    var capacity = columnCapacity(page);
-    var contentHeight = columnContentHeight(column);
-    var idealScale = (capacity * targetPages) / Math.max(contentHeight, 1);
-    var lower = targetPages ? minPrintScale : 1;
-    var upper = Math.min(maxPrintScale, Math.max(lower, idealScale));
+  function findLargestScale(pageLimit, sidebarLimit, lower, measure) {
+    var upper = maxPrintScale;
     var best = lower;
 
-    setColumnScale(column, lower);
-    if (columnPageCount(column, scaleFitSafety) > targetPages) {
+    if (fitsPageShape(measure(upper), pageLimit, sidebarLimit)) {
+      return upper;
+    }
+
+    if (!fitsPageShape(measure(lower), pageLimit, sidebarLimit)) {
       return lower;
     }
 
     for (var index = 0; index < 8; index += 1) {
       var next = (lower + upper) / 2;
-      setColumnScale(column, next);
-
-      if (columnPageCount(column, scaleFitSafety) <= targetPages) {
+      if (fitsPageShape(measure(next), pageLimit, sidebarLimit)) {
         best = next;
         lower = next;
       } else {
@@ -386,78 +435,47 @@
       }
     }
 
-    setColumnScale(column, best);
     return best;
   }
 
-  function printScale() {
-    var page = buildPrintPage(true);
-    var scale = printScaleForPage(page);
-    removePrintPage();
-    return scale;
-  }
+  function measurePages() {
+    var cache = {};
+    var measure = function (value) {
+      var key = value.toFixed(5);
+      if (!cache[key]) {
+        var documentElement = buildPrintDocument(scalePair(value), true);
+        cache[key] = {
+          pages: documentElement.querySelectorAll(".cv-export-print-page").length,
+          sidebarPages: documentElement.querySelectorAll(".cv-export-print-page:not(.cv-export-print-page--main-only)").length
+        };
+        removePrintPage();
+      }
+      return cache[key];
+    };
+    var mode = targetSelect.value;
+    var value = 1;
 
-  function verticalPadding(element) {
-    var style = window.getComputedStyle(element);
-    return parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
-  }
+    if (scaleFillCheckbox.checked) {
+      if (mode === "none") {
+        var natural = measure(1);
+        value = findLargestScale(natural.pages, natural.sidebarPages, 1, measure);
+      } else if (mode === "minimum") {
+        var minimum = measure(minPrintScale);
+        value = findLargestScale(minimum.pages, minimum.sidebarPages, minPrintScale, measure);
+      } else {
+        var target = Number(mode);
+        var naturalPages = measure(1).pages;
+        var minimumResult = measure(minPrintScale);
+        var minimumPages = minimumResult.pages;
+        var pageLimit = minimumPages > target ? minimumPages : Math.min(target, naturalPages);
+        value = findLargestScale(pageLimit, minimumResult.sidebarPages, minPrintScale, measure);
+      }
+    }
 
-  function columnCapacity(page) {
-    var columns = page.querySelectorAll(".cv-export-print-main, .cv-export-print-side");
-    var padding = 0;
-
-    Array.prototype.slice.call(columns).forEach(function (column) {
-      padding = Math.max(padding, verticalPadding(column));
-    });
-
-    return Math.max(1, printablePageHeight() - padding);
-  }
-
-  function columnContentHeight(column) {
-    var style = window.getComputedStyle(column);
-    var columnTop = column.getBoundingClientRect().top + parseFloat(style.paddingTop);
-    var bottom = columnTop;
-
-    Array.prototype.slice.call(column.children).forEach(function (child) {
-      var childStyle = window.getComputedStyle(child);
-      var childBox = child.getBoundingClientRect();
-      bottom = Math.max(bottom, childBox.bottom + parseFloat(childStyle.marginBottom));
-    });
-
-    return Math.max(0, bottom - columnTop);
-  }
-
-  function tallestColumnContentHeight(page) {
-    var columns = page.querySelectorAll(".cv-export-print-main, .cv-export-print-side");
-    var height = 0;
-
-    Array.prototype.slice.call(columns).forEach(function (column) {
-      height = Math.max(height, columnContentHeight(column));
-    });
-
-    return height;
-  }
-
-  function columnPageCount(column, safety) {
-    var tolerance = typeof safety === "number" ? -safety : 12;
-    return Math.max(1, Math.ceil((columnContentHeight(column) - tolerance) / columnCapacity(column.closest(".cv-export-print-page"))));
-  }
-
-  function measuredPageCount(page, safety) {
-    var tolerance = typeof safety === "number" ? -safety : 12;
-    return Math.max(1, Math.ceil((tallestColumnContentHeight(page) - tolerance) / columnCapacity(page)));
-  }
-
-  function printablePageHeight() {
-    var ruler = document.createElement("div");
-    ruler.style.height = "297mm";
-    ruler.style.left = "-9999px";
-    ruler.style.position = "absolute";
-    ruler.style.top = "0";
-    document.body.appendChild(ruler);
-    var height = ruler.getBoundingClientRect().height;
-    ruler.remove();
-    return height;
+    return {
+      pages: measure(value).pages,
+      scale: scalePair(value)
+    };
   }
 
   function updateThemeClass() {
@@ -477,6 +495,11 @@
     return " " + label("AutoFit") + " " + label("AutoFitMain") + " " + Math.round(scale.main * 100) + "%, " + label("AutoFitSidebar") + " " + Math.round(scale.side * 100) + "%.";
   }
 
+  function selectedPageTarget() {
+    var target = Number(targetSelect.value);
+    return Number.isFinite(target) && target > 0 ? target : null;
+  }
+
   function update() {
     document.documentElement.classList.add("cv-export-filtering");
     document.documentElement.classList.toggle("cv-export-target-one", targetSelect.value === "1");
@@ -484,7 +507,7 @@
 
     var estimate = measurePages();
     var pages = estimate.pages;
-    var target = targetSelect.value ? Number(targetSelect.value) : null;
+    var target = selectedPageTarget();
     var estimateText = label("Estimated") + " " + pages + " " + (pages === 1 ? label("Page") : label("Pages")) + "." + scaleNote(estimate.scale);
 
     if (target && pages > target) {
@@ -495,7 +518,7 @@
       status.classList.remove("cv-export__status--warning");
     }
 
-    return pages;
+    return estimate;
   }
 
   function moveSectionTo(section, targetSection, afterTarget) {
@@ -783,17 +806,10 @@
   scaleFillCheckbox.addEventListener("change", update);
 
   printButton.addEventListener("click", function () {
-    var pages = update();
-    var target = targetSelect.value ? Number(targetSelect.value) : null;
+    var estimate = update();
 
-    if (target && pages > target && !window.confirm(label("ConfirmPrefix") + " " + pages + " " + label("ConfirmSuffix"))) {
-      return;
-    }
-
+    buildPrintDocument(estimate.scale, false);
     document.documentElement.classList.add("cv-export-printing");
-    var scale = printScale();
-    var page = buildPrintPage(false);
-    setPrintScales(page, scale);
     window.print();
   });
 
