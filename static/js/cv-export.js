@@ -9,6 +9,7 @@
   var rowsContainer = panel.querySelector("[data-cv-export-options]");
   var status = panel.querySelector("[data-cv-export-status]");
   var printButton = panel.querySelector("[data-cv-export-print]");
+  var languageSelect = panel.querySelector("[data-cv-export-language]");
   var targetSelect = panel.querySelector("[data-cv-export-target]");
   var themeSelect = panel.querySelector("[data-cv-export-theme]");
   var profilePlacementSelect = panel.querySelector("[data-cv-export-profile-placement]");
@@ -27,22 +28,53 @@
     return;
   }
 
-  var sections = Array.prototype.slice.call(documentRoot.querySelectorAll(".cv-page__content h2")).map(function (heading) {
-    var list = heading.nextElementSibling;
-    if (!list || !list.classList.contains("jr__list")) {
-      return null;
-    }
+  function label(name) {
+    return panel.dataset["cvExportLabel" + name] || "";
+  }
 
-    return {
-      control: null,
-      enabled: true,
-      heading: heading,
-      rows: Array.prototype.slice.call(list.querySelectorAll(".jr__item")),
-      title: cleanText(heading)
-    };
-  }).filter(function (section) {
-    return section && section.rows.length;
+  openButton.addEventListener("click", openPanel);
+  closeButtons.forEach(function (button) {
+    button.addEventListener("click", closePanel);
   });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && !panel.hidden) {
+      closePanel();
+    }
+  });
+
+  var activeDocumentRoot = documentRoot;
+  var activeBio = document.querySelector(".bio");
+  var sections = [];
+
+  function buildSections(root) {
+    return Array.prototype.slice.call(root.querySelectorAll(".cv-page__content h2")).map(function (heading) {
+      var list = heading.nextElementSibling;
+      if (!list || !list.classList.contains("jr__list")) {
+        return null;
+      }
+
+      return {
+        control: null,
+        enabled: true,
+        heading: heading,
+        key: list.className,
+        rows: Array.prototype.slice.call(list.querySelectorAll(".jr__item")),
+        title: cleanText(heading)
+      };
+    }).filter(function (section) {
+      return section && section.rows.length;
+    });
+  }
+
+  function resetSectionState() {
+    sections.forEach(function (section) {
+      section.rows.forEach(function (row) {
+        row.classList.remove("cv-export-hidden");
+        delete row.dataset.cvExportPlacement;
+      });
+    });
+  }
 
   function textFrom(element, selector) {
     var match = element.querySelector(selector);
@@ -108,7 +140,12 @@
 
   function openPanel() {
     panel.hidden = false;
-    update();
+    try {
+      update();
+    } catch (error) {
+      status.textContent = error && error.message ? error.message : "";
+      status.classList.add("cv-export__status--warning");
+    }
   }
 
   function removePrintPage() {
@@ -202,12 +239,12 @@
     var side = document.createElement("aside");
     side.className = "cv-export-print-side";
 
-    var title = documentRoot.querySelector(".cv-page__content h1");
+    var title = activeDocumentRoot.querySelector(".cv-page__content h1");
     if (title) {
       main.appendChild(title.cloneNode(true));
     }
 
-    var bio = document.querySelector(".bio");
+    var bio = activeBio;
     if (bio) {
       var bioClone = bio.cloneNode(true);
       bioClone.classList.add("cv-export-print-profile");
@@ -390,10 +427,10 @@
     }
 
     if (Math.round(scale.main * 100) === Math.round(scale.side * 100)) {
-      return " Auto-fit: " + Math.round(scale.main * 100) + "%.";
+      return " " + label("AutoFit") + " " + Math.round(scale.main * 100) + "%.";
     }
 
-    return " Auto-fit: main " + Math.round(scale.main * 100) + "%, sidebar " + Math.round(scale.side * 100) + "%.";
+    return " " + label("AutoFit") + " " + label("AutoFitMain") + " " + Math.round(scale.main * 100) + "%, " + label("AutoFitSidebar") + " " + Math.round(scale.side * 100) + "%.";
   }
 
   function update() {
@@ -404,10 +441,10 @@
     var estimate = measurePages();
     var pages = estimate.pages;
     var target = targetSelect.value ? Number(targetSelect.value) : null;
-    var estimateText = "Estimated content: " + pages + " page" + (pages === 1 ? "." : "s.") + scaleNote(estimate.scale);
+    var estimateText = label("Estimated") + " " + pages + " " + (pages === 1 ? label("Page") : label("Pages")) + "." + scaleNote(estimate.scale);
 
     if (target && pages > target) {
-      status.textContent = estimateText + " Warning: selected content exceeds the " + target + "-page target.";
+      status.textContent = estimateText + " " + label("Warning");
       status.classList.add("cv-export__status--warning");
     } else {
       status.textContent = estimateText;
@@ -434,19 +471,60 @@
     update();
   }
 
+  function exportSourceUrl(value) {
+    return new URL(value || window.location.pathname, window.location.href).href;
+  }
+
+  function loadExportLanguage(url) {
+    var previousStatusText = status.textContent;
+    var previousStatusWarning = status.classList.contains("cv-export__status--warning");
+    return fetch(exportSourceUrl(url), {
+      credentials: "same-origin"
+    }).then(function (response) {
+      if (!response.ok) {
+        throw new Error(response.status + " " + response.statusText);
+      }
+      return response.text();
+    }).then(function (html) {
+      var parsed = new DOMParser().parseFromString(html, "text/html");
+      var nextRoot = parsed.querySelector("[data-cv-export-document]");
+      var nextBio = parsed.querySelector(".bio");
+
+      if (!nextRoot || !nextBio) {
+        throw new Error("Could not load selected CV language.");
+      }
+
+      var nextSections = buildSections(nextRoot);
+      activeDocumentRoot = nextRoot;
+      activeBio = nextBio;
+
+      if (canPatchSections(nextSections)) {
+        patchSectionControls(nextSections);
+      } else {
+        rebuildSectionControls(nextRoot, nextBio);
+      }
+
+      update();
+    }).catch(function (error) {
+      status.textContent = error && error.message ? error.message : previousStatusText;
+      status.classList.toggle("cv-export__status--warning", previousStatusWarning);
+      status.classList.add("cv-export__status--warning");
+    });
+  }
+
   function renderSectionControls() {
-    rowsContainer.textContent = "";
+    var fragment = document.createDocumentFragment();
 
     sections.forEach(function (section) {
       section.control.classList.toggle("cv-export__section--dragging", section === draggedSection);
       section.control.classList.toggle("cv-export__section--disabled", !section.enabled);
-      rowsContainer.appendChild(section.control);
+      fragment.appendChild(section.control);
     });
+
+    rowsContainer.replaceChildren(fragment);
   }
 
-  var rowIndex = 0;
-
-  sections.forEach(function (section) {
+  function createSectionControl(section, rowIndexState) {
     var sectionControl = document.createElement("section");
     sectionControl.className = "cv-export__section";
 
@@ -456,7 +534,7 @@
     var sectionCheckbox = document.createElement("input");
     sectionCheckbox.type = "checkbox";
     sectionCheckbox.checked = true;
-    sectionCheckbox.setAttribute("aria-label", "Include " + section.title);
+    sectionCheckbox.setAttribute("aria-label", label("Include") + " " + section.title);
 
     var sectionTitleText = document.createElement("span");
     sectionTitleText.className = "cv-export__section-title";
@@ -466,9 +544,9 @@
     sectionRows.className = "cv-export__section-rows";
 
     section.rows.forEach(function (row) {
-      var id = "cv-export-row-" + rowIndex;
+      var id = "cv-export-row-" + rowIndexState.value;
       var placement = defaultPlacement(row);
-      rowIndex += 1;
+      rowIndexState.value += 1;
       row.classList.remove("cv-export-hidden");
       row.dataset.cvExportPlacement = placement;
 
@@ -480,23 +558,23 @@
       checkbox.checked = true;
       checkbox.id = id;
 
-      var label = document.createElement("label");
-      label.htmlFor = id;
+      var rowLabel = document.createElement("label");
+      rowLabel.htmlFor = id;
 
       var text = document.createElement("span");
       text.textContent = rowTitle(row);
-      label.appendChild(text);
+      rowLabel.appendChild(text);
 
       var placementSelect = document.createElement("select");
-      placementSelect.setAttribute("aria-label", "PDF column for " + rowTitle(row));
+      placementSelect.setAttribute("aria-label", label("PdfColumnFor") + " " + rowTitle(row));
 
       var mainOption = document.createElement("option");
       mainOption.value = "main";
-      mainOption.textContent = "Main";
+      mainOption.textContent = label("Main");
 
       var sideOption = document.createElement("option");
       sideOption.value = "side";
-      sideOption.textContent = "Sidebar";
+      sideOption.textContent = label("Sidebar");
 
       placementSelect.appendChild(mainOption);
       placementSelect.appendChild(sideOption);
@@ -513,9 +591,15 @@
       });
 
       rowControl.appendChild(checkbox);
-      rowControl.appendChild(label);
+      rowControl.appendChild(rowLabel);
       rowControl.appendChild(placementSelect);
       sectionRows.appendChild(rowControl);
+
+      row._cvExportControl = {
+        label: rowLabel,
+        placementSelect: placementSelect,
+        text: text
+      };
     });
 
     sectionCheckbox.addEventListener("change", function () {
@@ -584,22 +668,71 @@
     sectionControl.appendChild(sectionRows);
 
     section.control = sectionControl;
-  });
+    section.titleElement = sectionTitleText;
+    section.rowsElement = sectionRows;
+  }
 
-  renderSectionControls();
+  function canPatchSections(nextSections) {
+    return sections.every(function (section) {
+      var nextSection = nextSections.find(function (candidate) {
+        return candidate.key === section.key;
+      });
+      return nextSection && section.rows.length === nextSection.rows.length;
+    });
+  }
 
-  openButton.addEventListener("click", openPanel);
-  closeButtons.forEach(function (button) {
-    button.addEventListener("click", closePanel);
-  });
+  function patchSectionControls(nextSections) {
+    sections.forEach(function (section) {
+      var nextSection = nextSections.find(function (candidate) {
+        return candidate.key === section.key;
+      });
+      section.heading = nextSection.heading;
+      section.key = nextSection.key;
+      section.title = nextSection.title;
+      section.titleElement.textContent = nextSection.title;
 
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && !panel.hidden) {
-      closePanel();
-    }
-  });
+      section.rows.forEach(function (row, rowIndex) {
+        var nextRow = nextSection.rows[rowIndex];
+        nextRow.classList.toggle("cv-export-hidden", row.classList.contains("cv-export-hidden"));
+        nextRow.dataset.cvExportPlacement = row.dataset.cvExportPlacement;
+        section.rows[rowIndex] = nextRow;
+
+        if (row._cvExportControl) {
+          row._cvExportControl.text.textContent = rowTitle(nextRow);
+          row._cvExportControl.placementSelect.setAttribute("aria-label", label("PdfColumnFor") + " " + rowTitle(nextRow));
+          nextRow._cvExportControl = row._cvExportControl;
+        }
+      });
+    });
+  }
+
+  function rebuildSectionControls(root, bio) {
+    resetSectionState();
+    activeDocumentRoot = root;
+    activeBio = bio;
+    sections = buildSections(activeDocumentRoot);
+
+    var rowIndexState = {
+      value: 0
+    };
+
+    sections.forEach(function (section) {
+      createSectionControl(section, rowIndexState);
+    });
+
+    renderSectionControls();
+  }
+
+  rebuildSectionControls(activeDocumentRoot, activeBio);
 
   targetSelect.addEventListener("change", update);
+  if (languageSelect) {
+    languageSelect.addEventListener("change", function () {
+      if (languageSelect.value) {
+        loadExportLanguage(languageSelect.value);
+      }
+    });
+  }
   themeSelect.addEventListener("change", update);
   profilePlacementSelect.addEventListener("change", update);
   profileImageSizeSelect.addEventListener("change", update);
@@ -610,7 +743,7 @@
     var pages = update();
     var target = targetSelect.value ? Number(targetSelect.value) : null;
 
-    if (target && pages > target && !window.confirm("Selected content is estimated at " + pages + " pages. Continue to print anyway?")) {
+    if (target && pages > target && !window.confirm(label("ConfirmPrefix") + " " + pages + " " + label("ConfirmSuffix"))) {
       return;
     }
 

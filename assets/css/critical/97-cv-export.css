@@ -41,6 +41,7 @@
 .cv-export__dialog {
   background: var(--bg);
   border: 1px solid var(--bg3);
+  border-radius: 0.2rem;
   box-shadow: 0 0.8rem 2rem rgb(0 0 0 / 0.38);
   box-sizing: border-box;
   color: var(--fg);
@@ -55,11 +56,42 @@
   width: 100%;
 }
 
+.cv-export__dialog {
+  scrollbar-color: var(--bg3) var(--bg1);
+  scrollbar-width: thin;
+}
+
+.cv-export__dialog::-webkit-scrollbar {
+  width: 0.65rem;
+}
+
+.cv-export__dialog::-webkit-scrollbar-track {
+  background: var(--bg1);
+  border-radius: 0.2rem;
+}
+
+.cv-export__dialog::-webkit-scrollbar-thumb {
+  background: var(--bg3);
+  border: 2px solid var(--bg1);
+  border-radius: 0.2rem;
+}
+
+.cv-export__dialog::-webkit-scrollbar-thumb:hover {
+  background: var(--bg4);
+}
+
 .cv-export__header {
   align-items: flex-start;
+  background: var(--bg);
+  border-bottom: 1px solid var(--bg3);
   display: flex;
   gap: 1rem;
   justify-content: space-between;
+  margin: -1rem -1rem 1rem;
+  padding: 1rem;
+  position: sticky;
+  top: -1rem;
+  z-index: 1;
 }
 
 .cv-export__title {
@@ -74,6 +106,7 @@
 .cv-export__close {
   background: none;
   border: 1px solid var(--bg3);
+  border-radius: 0.2rem;
   color: var(--fg);
   cursor: pointer;
   font: inherit;
@@ -99,12 +132,14 @@
 .cv-export__field select {
   background: var(--bg1);
   border: 1px solid var(--bg3);
+  border-radius: 0.2rem;
   color: var(--fg1);
   font: inherit;
   padding: 0.35rem 0.55rem;
 }
 
 .cv-export__button {
+  border-radius: 0.2rem;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -133,6 +168,7 @@
 
 .cv-export__section {
   border: 1px solid var(--bg3);
+  border-radius: 0.2rem;
   cursor: grab;
   padding: 0.55rem;
 }
@@ -218,6 +254,7 @@
 .cv-export__row select {
   background: var(--bg1);
   border: 1px solid var(--bg3);
+  border-radius: 0.2rem;
   color: var(--fg1);
   font: inherit;
   padding: 0.2rem 0.35rem;
