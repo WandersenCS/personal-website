@@ -94,6 +94,14 @@
   z-index: 1;
 }
 
+.cv-export__header > :first-child {
+  min-width: 0;
+}
+
+.cv-export__header > .cv-export__button {
+  margin-left: auto;
+}
+
 .cv-export__title {
   font-weight: 700;
 }

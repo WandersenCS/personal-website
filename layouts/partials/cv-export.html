@@ -142,6 +142,7 @@
           <div id="cv-export-title" class="cv-export__title">{{ index $t "title" }}</div>
           <p class="cv-export__note">{{ index $t "note" }}</p>
         </div>
+        <button class="cv-export__button" type="button" data-cv-export-print>{{ index $t "export" }}</button>
         <button class="cv-export__close" type="button" data-cv-export-close aria-label="{{ index $t "close" }}">×</button>
       </div>
 
@@ -176,7 +177,6 @@
             <option value="dark">{{ index $t "dark" }}</option>
           </select>
         </label>
-        <button class="cv-export__button" type="button" data-cv-export-print>{{ index $t "export" }}</button>
       </div>
 
       <div class="cv-export__status" data-cv-export-status aria-live="polite"></div>
