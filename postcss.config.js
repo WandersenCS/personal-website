@@ -50,6 +50,13 @@ module.exports = {
             },
             safelist: [
               "data-theme",
+              "themed-select",
+              "themed-select__button",
+              "themed-select__button--open",
+              "themed-select__list",
+              "themed-select__native",
+              "themed-select__option",
+              "themed-select__option--selected",
               "cv-export-compact-entry-titles",
               "cv-export__row",
               "cv-export__status--warning",

@@ -11,6 +11,9 @@
   {{ end }}
 {{ end }}
 
+{{ $themedSelectVersion := now.Format "20060102150405" }}
+<script src="{{ printf "%s?v=%s" ("js/themed-select.js" | relURL) $themedSelectVersion }}" defer></script>
+
 {{ if eq .Type "cv" }}
   {{ $cvExportVersion := now.Format "20060102150405" }}
   <script src="{{ printf "%s?v=%s" ("js/cv-export.js" | relURL) $cvExportVersion }}" defer></script>
