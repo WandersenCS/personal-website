@@ -86,15 +86,3 @@ Custom behavior is implemented through local overrides instead of editing the th
 - `content/`
 
 Theme updates should preserve these files, but still review generated pages after each update.
-
-## Editing Documentation
-
-Wiki-ready editing guides live in `docs/wiki/`:
-
-- `docs/wiki/Home.md`
-- `docs/wiki/Editing-content.md`
-- `docs/wiki/Features-and-configuration.md`
-- `docs/wiki/Media-and-pages.md`
-- `docs/wiki/PDF-export.md`
-
-These pages document where each site element is edited, how theme features are enabled, and which local files override the upstream Gruvbox theme.
