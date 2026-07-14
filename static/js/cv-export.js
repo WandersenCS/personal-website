@@ -19,6 +19,13 @@
   var closeButtons = Array.prototype.slice.call(panel.querySelectorAll("[data-cv-export-close]"));
   var printDocument = null;
   var draggedSection = null;
+  var contentRevision = 0;
+  var estimateCacheKey = "";
+  var estimateCache = null;
+  var measurementCacheKey = "";
+  var measurementCache = {};
+  var updateFrame = null;
+  var updateRequest = 0;
   var minPrintScale = 0.88;
   var maxMainSpacing = 0.04;
   var maxPrintScale = 1.12;
@@ -133,6 +140,7 @@
   }
 
   function closePanel() {
+    cancelScheduledUpdate();
     panel.hidden = true;
     document.documentElement.classList.remove("cv-export-filtering");
     removePrintPage();
@@ -140,12 +148,14 @@
 
   function openPanel() {
     panel.hidden = false;
-    try {
-      update();
-    } catch (error) {
-      status.textContent = error && error.message ? error.message : "";
-      status.classList.add("cv-export__status--warning");
-    }
+    document.documentElement.classList.add("cv-export-filtering");
+    updateThemeClass();
+    scheduleUpdate();
+    window.requestAnimationFrame(function () {
+      if (!panel.hidden) {
+        panel.dispatchEvent(new CustomEvent("themed-select:enhance", { bubbles: true }));
+      }
+    });
   }
 
   function removePrintPage() {
@@ -421,21 +431,43 @@
     return documentElement;
   }
 
-  function findLargestScale(lower, fits, maximum) {
+  function updateIsCurrent(request) {
+    return request === updateRequest && !panel.hidden;
+  }
+
+  function assertCurrentUpdate(request) {
+    if (!updateIsCurrent(request)) {
+      throw null;
+    }
+  }
+
+  function yieldForInteraction(request) {
+    var continuation = window.scheduler && typeof window.scheduler.yield === "function"
+      ? window.scheduler.yield()
+      : new Promise(function (resolve) {
+        window.setTimeout(resolve, 0);
+      });
+
+    return continuation.then(function () {
+      assertCurrentUpdate(request);
+    });
+  }
+
+  async function findLargestScale(lower, fits, maximum) {
     var upper = typeof maximum === "number" ? maximum : maxPrintScale;
     var best = lower;
 
-    if (fits(upper)) {
+    if (await fits(upper)) {
       return upper;
     }
 
-    if (!fits(lower)) {
+    if (!await fits(lower)) {
       return lower;
     }
 
     for (var index = 0; index < 8; index += 1) {
       var next = (lower + upper) / 2;
-      if (fits(next)) {
+      if (await fits(next)) {
         best = next;
         lower = next;
       } else {
@@ -446,21 +478,53 @@
     return best;
   }
 
-  function measurePages() {
-    var cache = {};
-    var measure = function (scale) {
+  function layoutStateKey() {
+    var sectionState = sections.map(function (section) {
+      var rowState = section.rows.map(function (row) {
+        return (row.classList.contains("cv-export-hidden") ? "0" : "1") + ":" + row.dataset.cvExportPlacement;
+      }).join(",");
+
+      return section.key + ":" + (section.enabled ? "1" : "0") + ":" + rowState;
+    }).join("|");
+
+    return [
+      contentRevision,
+      profileImageSizeSelect.value,
+      showProfileLinksCheckbox.checked ? "1" : "0",
+      sectionState
+    ].join(";");
+  }
+
+  function pageEstimateKey(layoutKey) {
+    return [
+      layoutKey,
+      targetSelect.value,
+      scaleFillCheckbox.checked ? "1" : "0"
+    ].join(";");
+  }
+
+  async function measurePages(request, layoutKey) {
+    if (measurementCacheKey !== layoutKey) {
+      measurementCacheKey = layoutKey;
+      measurementCache = {};
+    }
+
+    var measure = async function (scale) {
+      assertCurrentUpdate(request);
       var mainSpacing = scale.mainSpacing || 0;
       var key = scale.main.toFixed(5) + ":" + scale.side.toFixed(5) + ":" + mainSpacing.toFixed(5);
-      if (!cache[key]) {
+      if (!measurementCache[key]) {
         var documentElement = buildPrintDocument(scale, true);
-        cache[key] = {
+        measurementCache[key] = {
           pages: documentElement.querySelectorAll(".cv-export-print-page").length,
           sidebarPages: documentElement.querySelectorAll(".cv-export-print-page:not(.cv-export-print-page--main-only)").length,
-          sharedPageShortDateWraps: sharedPageShortDateWraps(documentElement)
+          hasSharedPageShortDateWraps: sharedPageShortDateWraps(documentElement).length > 0
         };
         removePrintPage();
+        await yieldForInteraction(request);
       }
-      return cache[key];
+
+      return measurementCache[key];
     };
     var mode = targetSelect.value;
     var scale = {
@@ -470,25 +534,25 @@
     };
 
     if (scaleFillCheckbox.checked) {
-      var minimum = measure({
+      var minimum = await measure({
         main: minPrintScale,
         side: minPrintScale
       });
       var sidebarLimit = minimum.sidebarPages;
       var pageLimit;
       var mainLower = minPrintScale;
-      var natural = measure({
+      var natural = await measure({
         main: 1,
         side: 1
       });
       var naturalPages = natural.pages;
-      var naturalMain = measure({
+      var naturalMain = await measure({
         main: 1,
         side: minPrintScale
       });
 
       if (mode === "none") {
-        if (!naturalMain.sharedPageShortDateWraps.length) {
+        if (!naturalMain.hasSharedPageShortDateWraps) {
           mainLower = 1;
         }
         pageLimit = naturalPages;
@@ -499,36 +563,51 @@
         pageLimit = minimum.pages > target ? minimum.pages : Math.min(target, naturalPages);
       }
 
-      scale.main = findLargestScale(mainLower, function (value) {
-        var result = measure({
+      scale.main = await findLargestScale(mainLower, async function (value) {
+        var result = await measure({
           main: value,
           side: minPrintScale
         });
-        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit && !result.sharedPageShortDateWraps.length;
+        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit && !result.hasSharedPageShortDateWraps;
       });
 
-      scale.side = findLargestScale(minPrintScale, function (value) {
-        var result = measure({
+      scale.side = await findLargestScale(minPrintScale, async function (value) {
+        var result = await measure({
           main: scale.main,
           side: value
         });
-        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit && !result.sharedPageShortDateWraps.length;
+        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit && !result.hasSharedPageShortDateWraps;
       });
 
-      scale.mainSpacing = findLargestScale(0, function (value) {
-        var result = measure({
+      scale.mainSpacing = await findLargestScale(0, async function (value) {
+        var result = await measure({
           main: scale.main,
           mainSpacing: value,
           side: scale.side
         });
-        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit && !result.sharedPageShortDateWraps.length;
+        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit && !result.hasSharedPageShortDateWraps;
       }, maxMainSpacing);
     }
 
     return {
-      pages: measure(scale).pages,
+      pages: (await measure(scale)).pages,
       scale: scale
     };
+  }
+
+  async function pageEstimate(request) {
+    var layoutKey = layoutStateKey();
+    var key = pageEstimateKey(layoutKey);
+
+    if (estimateCache && estimateCacheKey === key) {
+      return estimateCache;
+    }
+
+    var estimate = await measurePages(request, layoutKey);
+    assertCurrentUpdate(request);
+    estimateCacheKey = key;
+    estimateCache = estimate;
+    return estimate;
   }
 
   function updateThemeClass() {
@@ -553,11 +632,14 @@
     return Number.isFinite(target) && target > 0 ? target : null;
   }
 
-  function update() {
+  async function update(request) {
+    assertCurrentUpdate(request);
     document.documentElement.classList.add("cv-export-filtering");
     updateThemeClass();
+    status.setAttribute("aria-busy", "true");
 
-    var estimate = measurePages();
+    var estimate = await pageEstimate(request);
+    assertCurrentUpdate(request);
     var pages = estimate.pages;
     var target = selectedPageTarget();
     var estimateText = label("Estimated") + " " + pages + " " + (pages === 1 ? label("Page") : label("Pages")) + "." + scaleNote(estimate.scale);
@@ -570,7 +652,56 @@
       status.classList.remove("cv-export__status--warning");
     }
 
+    status.removeAttribute("aria-busy");
     return estimate;
+  }
+
+  function handleUpdateError(error, request) {
+    if (!updateIsCurrent(request)) {
+      return;
+    }
+
+    status.removeAttribute("aria-busy");
+    status.textContent = error && error.message ? error.message : "";
+    status.classList.add("cv-export__status--warning");
+  }
+
+  function runScheduledUpdate() {
+    var request = updateRequest;
+    updateFrame = null;
+    update(request).catch(function (error) {
+      handleUpdateError(error, request);
+    });
+  }
+
+  function scheduleUpdate() {
+    updateRequest += 1;
+
+    if (updateFrame !== null) {
+      return;
+    }
+
+    updateFrame = window.requestAnimationFrame(function () {
+      updateFrame = window.requestAnimationFrame(runScheduledUpdate);
+    });
+  }
+
+  function cancelScheduledUpdate() {
+    updateRequest += 1;
+    if (updateFrame !== null) {
+      window.cancelAnimationFrame(updateFrame);
+      updateFrame = null;
+    }
+    status.removeAttribute("aria-busy");
+  }
+
+  function updateImmediately() {
+    cancelScheduledUpdate();
+    var request = updateRequest;
+    return update(request).catch(function (error) {
+      handleUpdateError(error, request);
+      return null;
+    });
   }
 
   function moveSectionTo(section, targetSection, afterTarget) {
@@ -587,7 +718,7 @@
     }
     sections.splice(targetIndex + (afterTarget ? 1 : 0), 0, section);
     renderSectionControls();
-    update();
+    scheduleUpdate();
   }
 
   function exportSourceUrl(value) {
@@ -623,7 +754,8 @@
         rebuildSectionControls(nextRoot, nextBio);
       }
 
-      update();
+      contentRevision += 1;
+      scheduleUpdate();
     }).catch(function (error) {
       status.textContent = error && error.message ? error.message : previousStatusText;
       status.classList.toggle("cv-export__status--warning", previousStatusWarning);
@@ -701,12 +833,12 @@
 
       checkbox.addEventListener("change", function () {
         row.classList.toggle("cv-export-hidden", !checkbox.checked);
-        update();
+        scheduleUpdate();
       });
 
       placementSelect.addEventListener("change", function () {
         row.dataset.cvExportPlacement = placementSelect.value;
-        update();
+        scheduleUpdate();
       });
 
       rowControl.appendChild(checkbox);
@@ -727,7 +859,7 @@
         control.disabled = !section.enabled;
       });
       renderSectionControls();
-      update();
+      scheduleUpdate();
     });
 
     sectionControl.draggable = true;
@@ -844,7 +976,7 @@
 
   rebuildSectionControls(activeDocumentRoot, activeBio);
 
-  targetSelect.addEventListener("change", update);
+  targetSelect.addEventListener("change", scheduleUpdate);
   if (languageSelect) {
     languageSelect.addEventListener("change", function () {
       if (languageSelect.value) {
@@ -852,13 +984,16 @@
       }
     });
   }
-  themeSelect.addEventListener("change", update);
-  profileImageSizeSelect.addEventListener("change", update);
-  showProfileLinksCheckbox.addEventListener("change", update);
-  scaleFillCheckbox.addEventListener("change", update);
+  themeSelect.addEventListener("change", scheduleUpdate);
+  profileImageSizeSelect.addEventListener("change", scheduleUpdate);
+  showProfileLinksCheckbox.addEventListener("change", scheduleUpdate);
+  scaleFillCheckbox.addEventListener("change", scheduleUpdate);
 
-  printButton.addEventListener("click", function () {
-    var estimate = update();
+  printButton.addEventListener("click", async function () {
+    var estimate = await updateImmediately();
+    if (!estimate) {
+      return;
+    }
 
     buildPrintDocument(estimate.scale, false);
     document.documentElement.classList.add("cv-export-printing");
