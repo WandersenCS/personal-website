@@ -626,9 +626,9 @@
   padding-left: 1rem;
 }
 
-.cv-export-print-side .jr-interests__list > ul,
-.cv-export-print-side .jr-languages__list > ul {
-  padding-left: 1.25rem;
+.cv-export-print-side .jr-interests__list,
+.cv-export-print-side .jr-languages__list {
+  padding-left: 1rem;
 }
 
 .cv-export-print-page .jr-skills__keyword-name {
