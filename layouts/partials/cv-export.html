@@ -8,8 +8,9 @@
       "exportLanguage" "PDF export language"
       "target" "Target"
       "noTarget" "No target"
-      "onePage" "1 page"
-      "twoPages" "2 pages"
+      "minimumPages" "Minimum pages"
+      "onePage" "1 page, best effort"
+      "twoPages" "2 pages, best effort"
       "theme" "Theme"
       "light" "Light"
       "dark" "Dark"
@@ -32,8 +33,6 @@
       "autoFitMain" "main"
       "autoFitSidebar" "sidebar"
       "warning" "Warning: selected content exceeds the page target."
-      "confirmPrefix" "Selected content is estimated at"
-      "confirmSuffix" "pages. Continue to print anyway?"
       "languageNames" (dict "en" "English" "de" "German" "fr" "French")
     )
     "de" (dict
@@ -44,8 +43,9 @@
       "exportLanguage" "Sprache für PDF-Export"
       "target" "Ziel"
       "noTarget" "Kein Ziel"
-      "onePage" "1 Seite"
-      "twoPages" "2 Seiten"
+      "minimumPages" "Minimale Seitenzahl"
+      "onePage" "1 Seite, bestmöglich"
+      "twoPages" "2 Seiten, bestmöglich"
       "theme" "Darstellung"
       "light" "Hell"
       "dark" "Dunkel"
@@ -68,8 +68,6 @@
       "autoFitMain" "Hauptspalte"
       "autoFitSidebar" "Seitenleiste"
       "warning" "Warnung: Ausgewählter Inhalt überschreitet das Seitenziel."
-      "confirmPrefix" "Ausgewählter Inhalt wird auf"
-      "confirmSuffix" "Seiten geschätzt. Trotzdem drucken?"
       "languageNames" (dict "en" "Englisch" "de" "Deutsch" "fr" "Französisch")
     )
     "fr" (dict
@@ -80,8 +78,9 @@
       "exportLanguage" "Langue de l'export PDF"
       "target" "Objectif"
       "noTarget" "Aucun objectif"
-      "onePage" "1 page"
-      "twoPages" "2 pages"
+      "minimumPages" "Minimum de pages"
+      "onePage" "1 page, au mieux"
+      "twoPages" "2 pages, au mieux"
       "theme" "Thème"
       "light" "Clair"
       "dark" "Sombre"
@@ -104,8 +103,6 @@
       "autoFitMain" "principal"
       "autoFitSidebar" "latéral"
       "warning" "Avertissement : le contenu sélectionné dépasse l’objectif de pages."
-      "confirmPrefix" "Le contenu sélectionné est estimé à"
-      "confirmSuffix" "pages. Continuer l'impression ?"
       "languageNames" (dict "en" "Anglais" "de" "Allemand" "fr" "Français")
     )
   }}
@@ -125,8 +122,6 @@
     data-cv-export-label-auto-fit-main="{{ index $t "autoFitMain" }}"
     data-cv-export-label-auto-fit-sidebar="{{ index $t "autoFitSidebar" }}"
     data-cv-export-label-warning="{{ index $t "warning" }}"
-    data-cv-export-label-confirm-prefix="{{ index $t "confirmPrefix" }}"
-    data-cv-export-label-confirm-suffix="{{ index $t "confirmSuffix" }}"
     hidden
   >
     <div class="cv-export__backdrop" data-cv-export-close></div>
@@ -159,9 +154,10 @@
         <label class="cv-export__field">
           <span>{{ index $t "target" }}</span>
           <select data-cv-export-target>
-            <option value="">{{ index $t "noTarget" }}</option>
-            <option value="1" selected>{{ index $t "onePage" }}</option>
+            <option value="minimum" selected>{{ index $t "minimumPages" }}</option>
+            <option value="1">{{ index $t "onePage" }}</option>
             <option value="2">{{ index $t "twoPages" }}</option>
+            <option value="none">{{ index $t "noTarget" }}</option>
           </select>
         </label>
         <label class="cv-export__field">
