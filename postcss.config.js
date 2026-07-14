@@ -85,7 +85,6 @@ module.exports = {
               "cv-export__section-header",
               "cv-export__section-rows",
               "cv-export__section-title",
-              "cv-export-target-one",
             ],
           }),
         ]

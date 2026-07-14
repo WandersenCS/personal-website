@@ -133,7 +133,6 @@
   function closePanel() {
     panel.hidden = true;
     document.documentElement.classList.remove("cv-export-filtering");
-    document.documentElement.classList.remove("cv-export-target-one");
     removePrintPage();
   }
 
@@ -402,32 +401,21 @@
     return documentElement;
   }
 
-  function scalePair(value) {
-    return {
-      main: value,
-      side: value
-    };
-  }
-
-  function fitsPageShape(result, pageLimit, sidebarLimit) {
-    return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit;
-  }
-
-  function findLargestScale(pageLimit, sidebarLimit, lower, measure) {
+  function findLargestScale(lower, fits) {
     var upper = maxPrintScale;
     var best = lower;
 
-    if (fitsPageShape(measure(upper), pageLimit, sidebarLimit)) {
+    if (fits(upper)) {
       return upper;
     }
 
-    if (!fitsPageShape(measure(lower), pageLimit, sidebarLimit)) {
+    if (!fits(lower)) {
       return lower;
     }
 
     for (var index = 0; index < 8; index += 1) {
       var next = (lower + upper) / 2;
-      if (fitsPageShape(measure(next), pageLimit, sidebarLimit)) {
+      if (fits(next)) {
         best = next;
         lower = next;
       } else {
@@ -440,10 +428,10 @@
 
   function measurePages() {
     var cache = {};
-    var measure = function (value) {
-      var key = value.toFixed(5);
+    var measure = function (scale) {
+      var key = scale.main.toFixed(5) + ":" + scale.side.toFixed(5);
       if (!cache[key]) {
-        var documentElement = buildPrintDocument(scalePair(value), true);
+        var documentElement = buildPrintDocument(scale, true);
         cache[key] = {
           pages: documentElement.querySelectorAll(".cv-export-print-page").length,
           sidebarPages: documentElement.querySelectorAll(".cv-export-print-page:not(.cv-export-print-page--main-only)").length
@@ -453,28 +441,54 @@
       return cache[key];
     };
     var mode = targetSelect.value;
-    var value = 1;
+    var scale = {
+      main: 1,
+      side: 1
+    };
 
     if (scaleFillCheckbox.checked) {
+      var minimum = measure({
+        main: minPrintScale,
+        side: minPrintScale
+      });
+      var sidebarLimit = minimum.sidebarPages;
+      var pageLimit;
+      var mainLower = minPrintScale;
+      var naturalPages = measure({
+        main: 1,
+        side: 1
+      }).pages;
+
       if (mode === "none") {
-        var natural = measure(1);
-        value = findLargestScale(natural.pages, natural.sidebarPages, 1, measure);
+        mainLower = 1;
+        pageLimit = naturalPages;
       } else if (mode === "minimum") {
-        var minimum = measure(minPrintScale);
-        value = findLargestScale(minimum.pages, minimum.sidebarPages, minPrintScale, measure);
+        pageLimit = minimum.pages;
       } else {
         var target = Number(mode);
-        var naturalPages = measure(1).pages;
-        var minimumResult = measure(minPrintScale);
-        var minimumPages = minimumResult.pages;
-        var pageLimit = minimumPages > target ? minimumPages : Math.min(target, naturalPages);
-        value = findLargestScale(pageLimit, minimumResult.sidebarPages, minPrintScale, measure);
+        pageLimit = minimum.pages > target ? minimum.pages : Math.min(target, naturalPages);
       }
+
+      scale.main = findLargestScale(mainLower, function (value) {
+        var result = measure({
+          main: value,
+          side: minPrintScale
+        });
+        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit;
+      });
+
+      scale.side = findLargestScale(minPrintScale, function (value) {
+        var result = measure({
+          main: scale.main,
+          side: value
+        });
+        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit;
+      });
     }
 
     return {
-      pages: measure(value).pages,
-      scale: scalePair(value)
+      pages: measure(scale).pages,
+      scale: scale
     };
   }
 
@@ -502,7 +516,6 @@
 
   function update() {
     document.documentElement.classList.add("cv-export-filtering");
-    document.documentElement.classList.toggle("cv-export-target-one", targetSelect.value === "1");
     updateThemeClass();
 
     var estimate = measurePages();

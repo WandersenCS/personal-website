@@ -750,12 +750,6 @@ html.cv-export-print-light {
   color: var(--print-fg3);
 }
 
-.cv-export-target-one .cv-export-print-page {
-  --cv-export-heading-font-size: 16.8px;
-  font-size: 10.5px;
-  line-height: 1.2;
-}
-
 @media (max-width: 767px) {
   header.header--cv {
     grid-template-areas: "heading language cv-export theme-toggle nav";
