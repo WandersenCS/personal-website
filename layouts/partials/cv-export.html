@@ -14,8 +14,6 @@
       "light" "Light"
       "dark" "Dark"
       "export" "Export as PDF"
-      "profile" "Profile: summary and photo"
-      "profileColumn" "PDF column for profile summary and photo"
       "sidebar" "Sidebar"
       "main" "Main"
       "profileImage" "Profile image"
@@ -52,8 +50,6 @@
       "light" "Hell"
       "dark" "Dunkel"
       "export" "Als PDF exportieren"
-      "profile" "Profil: Zusammenfassung und Foto"
-      "profileColumn" "PDF-Spalte für Profil, Zusammenfassung und Foto"
       "sidebar" "Seitenleiste"
       "main" "Hauptspalte"
       "profileImage" "Profilbild"
@@ -90,8 +86,6 @@
       "light" "Clair"
       "dark" "Sombre"
       "export" "Exporter en PDF"
-      "profile" "Profil : résumé et photo"
-      "profileColumn" "Colonne PDF pour le profil, le résumé et la photo"
       "sidebar" "Colonne latérale"
       "main" "Colonne principale"
       "profileImage" "Photo de profil"
@@ -180,13 +174,6 @@
       </div>
 
       <div class="cv-export__status" data-cv-export-status aria-live="polite"></div>
-      <div class="cv-export__profile-row">
-        <span>{{ index $t "profile" }}</span>
-        <select data-cv-export-profile-placement aria-label="{{ index $t "profileColumn" }}">
-          <option value="side" selected>{{ index $t "sidebar" }}</option>
-          <option value="main">{{ index $t "main" }}</option>
-        </select>
-      </div>
       <div class="cv-export__profile-row">
         <span>{{ index $t "profileImage" }}</span>
         <select data-cv-export-profile-image-size aria-label="{{ index $t "profileImageSize" }}">

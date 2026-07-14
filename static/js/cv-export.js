@@ -12,7 +12,6 @@
   var languageSelect = panel.querySelector("[data-cv-export-language]");
   var targetSelect = panel.querySelector("[data-cv-export-target]");
   var themeSelect = panel.querySelector("[data-cv-export-theme]");
-  var profilePlacementSelect = panel.querySelector("[data-cv-export-profile-placement]");
   var profileImageSizeSelect = panel.querySelector("[data-cv-export-profile-image-size]");
   var showProfileLinksCheckbox = panel.querySelector("[data-cv-export-show-profile-links]");
   var scaleFillCheckbox = panel.querySelector("[data-cv-export-scale-fill]");
@@ -23,8 +22,9 @@
   var minPrintScale = 0.88;
   var maxPrintScale = 1.12;
   var scaleFitSafety = 24;
+  var compactEntryTitlesClass = "cv-export-compact-entry-titles";
 
-  if (!rowsContainer || !status || !printButton || !targetSelect || !themeSelect || !profilePlacementSelect || !profileImageSizeSelect || !showProfileLinksCheckbox || !scaleFillCheckbox || !documentRoot) {
+  if (!rowsContainer || !status || !printButton || !targetSelect || !themeSelect || !profileImageSizeSelect || !showProfileLinksCheckbox || !scaleFillCheckbox || !documentRoot) {
     return;
   }
 
@@ -200,10 +200,15 @@
   }
 
   function profileLinkText(href) {
-    return href.replace(/^mailto:/, "");
+    return href
+      .replace(/^mailto:/, "")
+      .replace(/^https?:\/\/(?:www\.)?/i, "")
+      .replace(/\/$/, "");
   }
 
   function addProfileLinks(bioClone) {
+    bioClone.classList.toggle("cv-export-profile-links-visible", showProfileLinksCheckbox.checked);
+
     if (!showProfileLinksCheckbox.checked) {
       return;
     }
@@ -221,6 +226,30 @@
     });
   }
 
+  function dateRangeIsOnOwnRow(range) {
+    var tolerance = 1;
+    var row = range.closest(".jr__item-meta");
+    var rowFirst = row ? row.firstElementChild : null;
+
+    if (!rowFirst || rowFirst === range) {
+      return false;
+    }
+
+    var rangeBox = range.getBoundingClientRect();
+    var rowFirstBox = rowFirst ? rowFirst.getBoundingClientRect() : rangeBox;
+
+    return rangeBox.top > rowFirstBox.bottom - tolerance;
+  }
+
+  function updateEntryTitleCompaction(root) {
+    root.classList.remove(compactEntryTitlesClass);
+
+    var ranges = Array.prototype.slice.call(root.querySelectorAll(".cv-export-print-main .jr__date-range"));
+    var shouldCompact = ranges.some(dateRangeIsOnOwnRow);
+
+    root.classList.toggle(compactEntryTitlesClass, shouldCompact);
+  }
+
   function buildPrintPage(measureOnly) {
     removePrintPage();
 
@@ -229,6 +258,7 @@
     page.style.setProperty("--cv-export-scale", "1");
     page.style.setProperty("--cv-export-main-scale", "1");
     page.style.setProperty("--cv-export-side-scale", "1");
+    page.style.setProperty("--cv-export-heading-scale", "1");
     if (measureOnly) {
       page.classList.add("cv-export-measure");
     }
@@ -250,7 +280,7 @@
       bioClone.classList.add("cv-export-print-profile");
       bioClone.classList.add("cv-export-image-" + profileImageSizeSelect.value);
       addProfileLinks(bioClone);
-      (profilePlacementSelect.value === "main" ? main : side).appendChild(bioClone);
+      side.appendChild(bioClone);
     }
 
     sections.forEach(function (section) {
@@ -262,6 +292,7 @@
     page.appendChild(side);
     document.body.appendChild(page);
     printPage = page;
+    updateEntryTitleCompaction(page);
 
     return page;
   }
@@ -310,15 +341,27 @@
   function setPrintScales(page, scale) {
     page.style.setProperty("--cv-export-main-scale", String(scale.main));
     page.style.setProperty("--cv-export-side-scale", String(scale.side));
+    page.style.setProperty("--cv-export-heading-scale", String(scale.main));
+    updateEntryTitleCompaction(page);
   }
 
   function columnScaleProperty(column) {
     return column.classList.contains("cv-export-print-side") ? "--cv-export-side-scale" : "--cv-export-main-scale";
   }
 
-  function verifiedColumnScale(column, targetPages) {
+  function setColumnScale(column, scale) {
     var page = column.closest(".cv-export-print-page");
     var property = columnScaleProperty(column);
+
+    page.style.setProperty(property, String(scale));
+    if (property === "--cv-export-main-scale") {
+      page.style.setProperty("--cv-export-heading-scale", String(scale));
+    }
+    updateEntryTitleCompaction(page);
+  }
+
+  function verifiedColumnScale(column, targetPages) {
+    var page = column.closest(".cv-export-print-page");
     var capacity = columnCapacity(page);
     var contentHeight = columnContentHeight(column);
     var idealScale = (capacity * targetPages) / Math.max(contentHeight, 1);
@@ -326,14 +369,14 @@
     var upper = Math.min(maxPrintScale, Math.max(lower, idealScale));
     var best = lower;
 
-    page.style.setProperty(property, String(lower));
+    setColumnScale(column, lower);
     if (columnPageCount(column, scaleFitSafety) > targetPages) {
       return lower;
     }
 
     for (var index = 0; index < 8; index += 1) {
       var next = (lower + upper) / 2;
-      page.style.setProperty(property, String(next));
+      setColumnScale(column, next);
 
       if (columnPageCount(column, scaleFitSafety) <= targetPages) {
         best = next;
@@ -343,6 +386,7 @@
       }
     }
 
+    setColumnScale(column, best);
     return best;
   }
 
@@ -734,7 +778,6 @@
     });
   }
   themeSelect.addEventListener("change", update);
-  profilePlacementSelect.addEventListener("change", update);
   profileImageSizeSelect.addEventListener("change", update);
   showProfileLinksCheckbox.addEventListener("change", update);
   scaleFillCheckbox.addEventListener("change", update);
