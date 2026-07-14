@@ -1,4 +1,4 @@
-<header>
+<header{{ if eq .Type "cv" }} class="header--cv"{{ end }}>
   <a
     class="logo"
     href="{{ "/" | relLangURL }}"
@@ -47,6 +47,12 @@
   <div class="header__mobile-controls">
     {{ partial "language-switcher.html" $ }}
   </div>
+
+  {{ if eq .Type "cv" }}
+    <button class="cv-export__toolbar-button" type="button" data-cv-export-open aria-label="Export CV as PDF">
+      PDF
+    </button>
+  {{ end }}
 
   <button class="theme__toggle light--hidden" aria-label="Toggle light mode">
     {{ partial "icons/tabler-icon.html" "outline/sun" }}

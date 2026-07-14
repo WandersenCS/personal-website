@@ -1,0 +1,61 @@
+{{ if eq .Type "cv" }}
+  <div class="cv-export" data-cv-export hidden>
+    <div class="cv-export__backdrop" data-cv-export-close></div>
+    <section class="cv-export__dialog" role="dialog" aria-modal="true" aria-labelledby="cv-export-title">
+      <div class="cv-export__header">
+        <div>
+          <div id="cv-export-title" class="cv-export__title">PDF export</div>
+          <p class="cv-export__note">Summary, skills, and languages are placed in the side column.</p>
+        </div>
+        <button class="cv-export__close" type="button" data-cv-export-close aria-label="Close PDF export">×</button>
+      </div>
+
+      <div class="cv-export__settings">
+        <label class="cv-export__field">
+          <span>Target</span>
+          <select data-cv-export-target>
+            <option value="">No target</option>
+            <option value="1" selected>1 page</option>
+            <option value="2">2 pages</option>
+          </select>
+        </label>
+        <label class="cv-export__field">
+          <span>Theme</span>
+          <select data-cv-export-theme>
+            <option value="light" selected>Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </label>
+        <button class="cv-export__button" type="button" data-cv-export-print>Export as PDF</button>
+      </div>
+
+      <div class="cv-export__status" data-cv-export-status aria-live="polite"></div>
+      <div class="cv-export__profile-row">
+        <span>Profile: summary and photo</span>
+        <select data-cv-export-profile-placement aria-label="PDF column for profile summary and photo">
+          <option value="side" selected>Sidebar</option>
+          <option value="main">Main</option>
+        </select>
+      </div>
+      <div class="cv-export__profile-row">
+        <span>Profile image</span>
+        <select data-cv-export-profile-image-size aria-label="PDF profile image size">
+          <option value="small">Small</option>
+          <option value="medium">Medium</option>
+          <option value="large" selected>Large</option>
+        </select>
+      </div>
+      <div class="cv-export__option-rows">
+        <label class="cv-export__option-row">
+          <input type="checkbox" data-cv-export-show-profile-links checked />
+          <span>Show profile link text</span>
+        </label>
+        <label class="cv-export__option-row">
+          <input type="checkbox" data-cv-export-scale-fill checked />
+          <span>Auto-fit export scale</span>
+        </label>
+      </div>
+      <div class="cv-export__rows" data-cv-export-options></div>
+    </section>
+  </div>
+{{ end }}

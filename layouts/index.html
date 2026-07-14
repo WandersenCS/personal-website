@@ -1,8 +1,11 @@
 {{ define "main" }}
-  <div class="content-section">
-    <h1>{{ .Title | markdownify }}</h1>
-    {{ with .Content }}
-      <div>{{ . }}</div>
-    {{ end }}
+  <div class="content-section cv-page" data-cv-export-document>
+    <div class="cv-page__content">
+      <h1>{{ .Title | markdownify }}</h1>
+      {{ with .Content }}
+        <div>{{ . }}</div>
+      {{ end }}
+    </div>
+    {{ partial "cv-export.html" . }}
   </div>
 {{ end }}
