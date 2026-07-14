@@ -50,6 +50,7 @@ module.exports = {
             },
             safelist: [
               "data-theme",
+              "cv-export-compact-entry-titles",
               "cv-export__row",
               "cv-export__status--warning",
               "cv-export-filtering",
@@ -62,8 +63,10 @@ module.exports = {
               "cv-export-print-light",
               "cv-export-print-main",
               "cv-export-print-page",
+              "cv-export-print-profile",
               "cv-export-print-side",
               "cv-export-printing",
+              "cv-export-profile-links-visible",
               "cv-export-profile-link",
               "cv-export__section",
               "cv-export__section--disabled",

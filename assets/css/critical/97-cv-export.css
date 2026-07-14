@@ -277,7 +277,19 @@
   display: none !important;
 }
 
+.cv-page__content .jr-awards__title,
+.cv-page__content .jr-certificates__name,
+.cv-page__content .jr-education__area,
+.cv-page__content .jr-projects__roles,
+.cv-page__content .jr-publications__name,
+.cv-page__content .jr-volunteer__position,
+.cv-page__content .jr-work__position {
+  font-size: 1.3rem;
+}
+
 .cv-export-print-page {
+  --cv-export-heading-font-size: 17.6px;
+  --cv-export-heading-scale: 1;
   align-content: stretch;
   background-clip: border-box;
   box-sizing: border-box;
@@ -317,7 +329,7 @@
 .cv-export-print-page h2 {
   border-bottom: 1px solid;
   break-after: avoid;
-  font-size: 1.35em;
+  font-size: calc(var(--cv-export-heading-font-size) * var(--cv-export-heading-scale));
   margin: 0.12in 0 0.04in;
 }
 
@@ -344,9 +356,10 @@
 }
 
 .cv-export-print-profile hr {
-  background: var(--print-fg3);
-  border: none;
-  height: 1px;
+  border: 0;
+  border-top: 1px solid var(--print-fg3);
+  display: block;
+  height: 0;
   margin: 0.08in auto;
   opacity: 0.45;
   width: 72%;
@@ -379,22 +392,150 @@
 }
 
 .cv-export-print-side .jr-basics__profile--row {
+  align-items: center;
+  column-gap: 0.06in;
+  flex-direction: row;
   justify-content: center;
 }
 
-.cv-export-print-side .jr-basics__profile-icon {
-  padding: 0 0.35rem;
+.cv-export-print-side .cv-export-profile-links-visible .jr-basics__profile--row {
+  flex-direction: column;
+  gap: 0.02in;
 }
 
-.cv-export-print-profile .jr-basics__summary + [class^="jr-basics__location-"] {
-  margin-top: 0.14in;
+.cv-export-print-side .jr-basics__profile {
+  align-self: center;
+  width: 100%;
+}
+
+.cv-export-print-side .jr-basics__profile-icon {
+  flex: 0 0 0.24in;
+  padding: 0;
+}
+
+.cv-export-print-profile .jr-basics__profile a {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+}
+
+.cv-export-print-side .jr-basics__profile--row > a {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.cv-export-print-side .cv-export-profile-links-visible .jr-basics__profile--row > a {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cv-export-print-profile .jr-basics__profile-item {
+  align-items: center;
+  display: grid;
+  gap: 0.02in;
+  grid-template-columns: 0.24in minmax(0, 1fr);
+  justify-items: center;
+  padding: 0.02in 0;
+}
+
+.cv-export-print-side .jr-basics__profile-item {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  max-width: 100%;
+}
+
+.cv-export-print-side .cv-export-profile-links-visible .jr-basics__profile-item {
+  flex-wrap: nowrap;
+  gap: 0.04in;
+}
+
+.cv-export-print-profile .jr-basics__profile-icon {
+  align-items: center;
+  display: flex;
+  height: 0.24in;
+  justify-content: center;
+  padding: 0;
+  width: 0.24in;
+}
+
+.cv-export-print-profile .jr-basics__profile-icon svg {
+  display: block;
+  height: 0.18in;
+  width: 0.18in;
+}
+
+.cv-export-print-side .icon-tabler-brand-linkedin {
+  transform: translateX(-0.0075in);
+}
+
+.cv-export-print-profile .jr-basics__summary + .jr-basics__location-address,
+.cv-export-print-profile .jr-basics__summary + .jr-basics__location-postalCode,
+.cv-export-print-profile .jr-basics__summary + .jr-basics__location-city,
+.cv-export-print-profile .jr-basics__summary + .jr-basics__location-countryCode,
+.cv-export-print-profile .jr-basics__summary + .jr-basics__location-region {
+  margin-top: 0.18in;
+}
+
+.cv-export-print-side .jr-basics__summary + .jr-basics__location-address,
+.cv-export-print-side .jr-basics__summary + .jr-basics__location-postalCode,
+.cv-export-print-side .jr-basics__summary + .jr-basics__location-city,
+.cv-export-print-side .jr-basics__summary + .jr-basics__location-countryCode,
+.cv-export-print-side .jr-basics__summary + .jr-basics__location-region {
+  margin-top: 0.18in;
+  width: 72%;
+}
+
+.cv-export-print-profile .jr-basics__location-address + hr,
+.cv-export-print-profile .jr-basics__location-postalCode + hr,
+.cv-export-print-profile .jr-basics__location-city + hr,
+.cv-export-print-profile .jr-basics__location-countryCode + hr,
+.cv-export-print-profile .jr-basics__location-region + hr {
+  margin-top: 0.12in;
 }
 
 .cv-export-print-side .jr-basics__summary {
   margin-bottom: 0;
 }
 
+.cv-export-print-page .jr__item-meta {
+  column-gap: 0.75em;
+  row-gap: 0.02in;
+}
+
+.cv-export-compact-entry-titles .cv-export-print-main .jr-awards__title,
+.cv-export-compact-entry-titles .cv-export-print-main .jr-certificates__name,
+.cv-export-compact-entry-titles .cv-export-print-main .jr-education__area,
+.cv-export-compact-entry-titles .cv-export-print-main .jr-projects__roles,
+.cv-export-compact-entry-titles .cv-export-print-main .jr-publications__name,
+.cv-export-compact-entry-titles .cv-export-print-main .jr-volunteer__position,
+.cv-export-compact-entry-titles .cv-export-print-main .jr-work__position {
+  font-size: 1.3em;
+}
+
+.cv-export-print-page .cv-export-print-side h2 {
+  border-color: var(--print-fg3);
+}
+
+.cv-export-print-side .jr__item-meta {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.cv-export-print-side .jr__date,
+.cv-export-print-side .jr__date-range {
+  flex-grow: 0;
+  justify-content: flex-start;
+  text-align: left;
+}
+
 .cv-export-print-side .jr-skills__keywords {
+  padding-left: 1rem;
+}
+
+.cv-export-print-side .jr-interests__list > ul,
+.cv-export-print-side .jr-languages__list > ul {
   padding-left: 1rem;
 }
 
@@ -448,8 +589,22 @@
   display: block;
   font-family: var(--font-serif);
   font-size: 0.82em;
-  margin-top: 0.02in;
+  line-height: 1.18;
+  margin-top: 0;
   overflow-wrap: anywhere;
+  text-align: left;
+  width: 100%;
+}
+
+.cv-export-print-side .cv-export-profile-link {
+  flex: 0 0 auto;
+  font-size: 0.9em;
+  max-width: none;
+  overflow-wrap: normal;
+  text-align: center;
+  white-space: nowrap;
+  width: auto;
+  word-break: normal;
 }
 
 html.cv-export-print-light,
@@ -525,6 +680,7 @@ html.cv-export-print-light {
 }
 
 .cv-export-target-one .cv-export-print-page {
+  --cv-export-heading-font-size: 16.8px;
   font-size: calc(10.5px * var(--cv-export-scale, 1));
   line-height: 1.2;
 }
@@ -545,6 +701,11 @@ html.cv-export-print-light {
 
 @media print {
   @page {
+    margin: 0;
+    size: A4;
+  }
+
+  @page cv-export {
     margin: 0;
     size: A4;
   }
@@ -571,6 +732,7 @@ html.cv-export-print-light {
   .cv-export-print-page {
     display: grid !important;
     min-height: 297mm;
+    page: cv-export;
     width: 210mm;
   }
 }
