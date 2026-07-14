@@ -567,8 +567,25 @@
 }
 
 .cv-export-print-page .jr__item-meta {
+  align-items: center;
   column-gap: 0.75em;
+  flex-flow: row wrap;
   row-gap: 0.02in;
+}
+
+.cv-export-print-main .jr-work__location,
+.cv-export-print-main .jr__date-range {
+  flex-grow: 1;
+  text-align: right;
+}
+
+.cv-export-print-main .jr-education__institution,
+.cv-export-print-main .jr-volunteer__organization {
+  flex-basis: 100%;
+}
+
+.cv-export-print-page .jr-work__description {
+  font-size: 0.9em;
 }
 
 .cv-export-compact-entry-titles .cv-export-print-main .jr-awards__title,
