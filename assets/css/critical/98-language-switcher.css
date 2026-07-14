@@ -3,6 +3,10 @@
   display: flex;
 }
 
+.search {
+  display: none;
+}
+
 .language-switcher__label {
   display: none;
 }

@@ -12,5 +12,6 @@
 {{ end }}
 
 {{ if eq .Type "cv" }}
-  <script src="{{ "js/cv-export.js" | relURL }}" defer></script>
+  {{ $cvExportVersion := now.Format "20060102150405" }}
+  <script src="{{ printf "%s?v=%s" ("js/cv-export.js" | relURL) $cvExportVersion }}" defer></script>
 {{ end }}
