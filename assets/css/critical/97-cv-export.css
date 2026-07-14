@@ -400,6 +400,10 @@
   margin: 0.12in 0 0.04in;
 }
 
+.cv-export-print-main h2 {
+  margin-top: calc(0.12in + var(--cv-export-main-spacing, 0in));
+}
+
 .cv-export-print-page .jr__item {
   break-inside: avoid;
 }
@@ -412,6 +416,10 @@
 
 .cv-export-print-page .jr__list {
   margin-bottom: 0.05in;
+}
+
+.cv-export-print-main .jr__item + .jr__item {
+  padding-top: var(--cv-export-main-spacing, 0in);
 }
 
 .cv-export-print-side .bio {

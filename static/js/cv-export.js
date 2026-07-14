@@ -20,7 +20,9 @@
   var printDocument = null;
   var draggedSection = null;
   var minPrintScale = 0.88;
+  var maxMainSpacing = 0.04;
   var maxPrintScale = 1.12;
+  var maxInlineDateLength = 28;
   var compactEntryTitlesClass = "cv-export-compact-entry-titles";
 
   if (!rowsContainer || !status || !printButton || !targetSelect || !themeSelect || !profileImageSizeSelect || !showProfileLinksCheckbox || !scaleFillCheckbox || !documentRoot) {
@@ -247,6 +249,23 @@
     return shouldCompact;
   }
 
+  function sharedPageShortDateWraps(root) {
+    var ranges = Array.prototype.slice.call(root.querySelectorAll(".cv-export-print-page:not(.cv-export-print-page--main-only) .cv-export-print-main .jr__date-range"));
+    return ranges.filter(dateRangeIsOnOwnRow).map(function (range) {
+      var row = range.closest(".jr__item-meta");
+      var title = row && row.firstElementChild ? row.firstElementChild.textContent.trim().replace(/\s+/g, " ") : "";
+      var date = range.textContent.trim().replace(/\s+/g, " ");
+      return {
+        date: date,
+        key: title + " | " + date
+      };
+    }).filter(function (entry) {
+      return entry.date.length <= maxInlineDateLength;
+    }).map(function (entry) {
+      return entry.key;
+    });
+  }
+
   function appendProfile(column) {
     var bioClone = activeBio.cloneNode(true);
     bioClone.classList.add("cv-export-print-profile");
@@ -377,6 +396,7 @@
     documentElement.style.setProperty("--cv-export-main-scale", String(scale.main));
     documentElement.style.setProperty("--cv-export-side-scale", String(scale.side));
     documentElement.style.setProperty("--cv-export-heading-scale", String(scale.main));
+    documentElement.style.setProperty("--cv-export-main-spacing", String(scale.mainSpacing || 0) + "in");
   }
 
   function buildPrintDocument(scale, measureOnly) {
@@ -401,8 +421,8 @@
     return documentElement;
   }
 
-  function findLargestScale(lower, fits) {
-    var upper = maxPrintScale;
+  function findLargestScale(lower, fits, maximum) {
+    var upper = typeof maximum === "number" ? maximum : maxPrintScale;
     var best = lower;
 
     if (fits(upper)) {
@@ -429,12 +449,14 @@
   function measurePages() {
     var cache = {};
     var measure = function (scale) {
-      var key = scale.main.toFixed(5) + ":" + scale.side.toFixed(5);
+      var mainSpacing = scale.mainSpacing || 0;
+      var key = scale.main.toFixed(5) + ":" + scale.side.toFixed(5) + ":" + mainSpacing.toFixed(5);
       if (!cache[key]) {
         var documentElement = buildPrintDocument(scale, true);
         cache[key] = {
           pages: documentElement.querySelectorAll(".cv-export-print-page").length,
-          sidebarPages: documentElement.querySelectorAll(".cv-export-print-page:not(.cv-export-print-page--main-only)").length
+          sidebarPages: documentElement.querySelectorAll(".cv-export-print-page:not(.cv-export-print-page--main-only)").length,
+          sharedPageShortDateWraps: sharedPageShortDateWraps(documentElement)
         };
         removePrintPage();
       }
@@ -443,6 +465,7 @@
     var mode = targetSelect.value;
     var scale = {
       main: 1,
+      mainSpacing: 0,
       side: 1
     };
 
@@ -454,13 +477,20 @@
       var sidebarLimit = minimum.sidebarPages;
       var pageLimit;
       var mainLower = minPrintScale;
-      var naturalPages = measure({
+      var natural = measure({
         main: 1,
         side: 1
-      }).pages;
+      });
+      var naturalPages = natural.pages;
+      var naturalMain = measure({
+        main: 1,
+        side: minPrintScale
+      });
 
       if (mode === "none") {
-        mainLower = 1;
+        if (!naturalMain.sharedPageShortDateWraps.length) {
+          mainLower = 1;
+        }
         pageLimit = naturalPages;
       } else if (mode === "minimum") {
         pageLimit = minimum.pages;
@@ -474,7 +504,7 @@
           main: value,
           side: minPrintScale
         });
-        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit;
+        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit && !result.sharedPageShortDateWraps.length;
       });
 
       scale.side = findLargestScale(minPrintScale, function (value) {
@@ -482,8 +512,17 @@
           main: scale.main,
           side: value
         });
-        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit;
+        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit && !result.sharedPageShortDateWraps.length;
       });
+
+      scale.mainSpacing = findLargestScale(0, function (value) {
+        var result = measure({
+          main: scale.main,
+          mainSpacing: value,
+          side: scale.side
+        });
+        return result.pages <= pageLimit && result.sidebarPages <= sidebarLimit && !result.sharedPageShortDateWraps.length;
+      }, maxMainSpacing);
     }
 
     return {
