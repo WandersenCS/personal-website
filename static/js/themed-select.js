@@ -181,6 +181,12 @@
   }
 
   function enhance(select) {
+    var hiddenExporter = select.closest("[data-cv-export][hidden]");
+
+    if (hiddenExporter) {
+      return;
+    }
+
     var normalizedWidth = normalizeExporterWidth(select);
 
     if (!useCustomSelect) {
@@ -281,6 +287,9 @@
       closeControl(openControl, false);
     }
   });
+  document.addEventListener("themed-select:enhance", function (event) {
+    enhanceWithin(event.target);
+  });
   window.addEventListener("resize", function () {
     closeControl(openControl, false);
   });
@@ -292,8 +301,12 @@
 
   var observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
+      if (mutation.target.closest && mutation.target.closest(".cv-export-print-document")) {
+        return;
+      }
+
       Array.prototype.slice.call(mutation.addedNodes).forEach(function (node) {
-        if (node.nodeType === Node.ELEMENT_NODE) {
+        if (node.nodeType === Node.ELEMENT_NODE && !(node.closest && node.closest(".cv-export-print-document"))) {
           enhanceWithin(node);
         }
       });
