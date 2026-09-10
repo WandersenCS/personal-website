@@ -13,5 +13,6 @@
     "stylelint-prettier": "^5.0.3"
   },
   "name": "personal-website",
+  "private": true,
   "version": "0.1.0"
 }
