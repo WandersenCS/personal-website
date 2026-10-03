@@ -1,5 +1,5 @@
 {
-  "sum": "fe680bdbcad3e84",
+  "sum": "4a4bf2b746ca2466",
   "dependencySources": {
     "dependencies": {},
     "devDependencies": {
@@ -8,10 +8,8 @@
       "eslint-plugin-prettier": "github.com/schnerring/hugo-theme-gruvbox",
       "husky": "github.com/schnerring/hugo-theme-gruvbox",
       "lint-staged": "github.com/schnerring/hugo-theme-gruvbox",
-      "markdownlint-cli": "github.com/schnerring/hugo-theme-gruvbox",
       "prettier": "github.com/schnerring/hugo-theme-gruvbox",
       "prettier-plugin-go-template": "github.com/schnerring/hugo-theme-gruvbox",
-      "stylelint": "github.com/schnerring/hugo-theme-gruvbox",
       "stylelint-prettier": "github.com/schnerring/hugo-theme-gruvbox"
     }
   }
