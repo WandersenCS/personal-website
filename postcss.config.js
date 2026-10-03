@@ -6,7 +6,7 @@ const postcssNesting = require("postcss-nesting");
 const postcssCustomMedia = require("postcss-custom-media");
 const postcssPresetEnv = require("postcss-preset-env");
 const cssnano = require("cssnano");
-const purgeCSSPlugin = require("@fullhuman/postcss-purgecss");
+const purgeCSSPlugin = require("@fullhuman/postcss-purgecss").default;
 
 module.exports = {
   plugins: [
